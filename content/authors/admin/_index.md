@@ -6,7 +6,7 @@ title: Chris Larkin
 name_pronunciation: ''
 
 # Full name (for SEO)
-first_name: Christopher Edward
+first_name: Christopher
 last_name: Larkin
 
 # Status emoji
