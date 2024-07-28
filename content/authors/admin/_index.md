@@ -91,7 +91,7 @@ work:
   - position: Senior Advisor
     company_name: Behavioural Insights Team
     company_url: 'https://www.bi.team'
-    company_logo: ''
+    company_logo: 'custom/bit_logo.png'
     date_start: 2016-01-01
     date_end: 2020-12-31
     summary: |
@@ -151,7 +151,7 @@ awards:
     url: https://www.thersa.org/
     date: '2011-03-01'
     awarder: The RSA (Royal Society of Arts, Manufactures and Commerce) 
-    icon: coursera
+    icon: 'custom/rsa_logo.svg'
     summary: |
       I studied the foundational concept of neural networks and deep learning. By the end, I was familiar with the significant technological trends driving the rise of deep learning; build, train, and apply fully connected deep neural networks; implement efficient (vectorized) neural networks; identify key parameters in a neural network’s architecture; and apply deep learning to your own applications.
   - title: Blockchain Fundamentals
