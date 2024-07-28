@@ -80,7 +80,7 @@ work:
   - position: Staff Quantitative UX Researcher
     company_name: Meta
     company_url: 'https://meta.com'
-    company_logo: facebook_logo.svg
+    company_logo: icon: "custom/facebook_logo.svg"
     date_start: 2021-02-01
     date_end: 2024-06-30
     summary: |2-
