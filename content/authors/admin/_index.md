@@ -151,7 +151,7 @@ awards:
     url: https://www.thersa.org/
     date: '2011-03-01'
     awarder: The RSA (Royal Society of Arts, Manufactures and Commerce) 
-    icon: 'custom/rsa_logo.svg'
+    icon: 'custom/rsa_logo'
     summary: |
       Fellows are committed to inspiring better ways of thinking, acting and delivering change. An integral part of the RSA in creating a better future, Fellows champion new ideas, drive social change, deliver practical solutions and support the RSA mission.
   - title: Blockchain Fundamentals
