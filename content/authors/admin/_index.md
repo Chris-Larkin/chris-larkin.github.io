@@ -1,17 +1,17 @@
 ---
 # Display name
-title: 吳健雄
+title: Chris Larkin
 
 # Name pronunciation (optional)
-name_pronunciation: Chien Shiung Wu
+name_pronunciation: ''
 
 # Full name (for SEO)
-first_name: Shiung Wu
-last_name: Chien
+first_name: Christopher Edward
+last_name: Larkin
 
 # Status emoji
 status:
-  icon: ☕️
+  icon: 🧗
 
 # Is this the primary user of the site?
 superuser: true
@@ -20,84 +20,77 @@ superuser: true
 highlight_name: true
 
 # Role/position/tagline
-role: Chief Scientist
+role: PhD Candidate, Economics
 
 # Organizations/Affiliations to display in Biography blox
 organizations:
-  - name: OpenAI
-    url: https://openai.com/
+  - name: Bikrbeck College, University of London
+    url: 
 
 # Social network links
 # Need to use another icon? Simply download the SVG icon to your `assets/media/icons/` folder.
 profiles:
   - icon: at-symbol
-    url: 'mailto:your-email@example.com'
+    url: 'mailto:christopher.e.larkin@gmail.com'
     label: E-mail Me
   - icon: brands/x
-    url: https://twitter.com/GetResearchDev
-  - icon: brands/instagram
-    url: https://www.instagram.com/
+    url: https://twitter.com/chris_e_larkin
   - icon: brands/github
-    url: https://github.com/gcushen
+    url: https://github.com/Chris-Larkin
   - icon: brands/linkedin
-    url: https://www.linkedin.com/
+    url: https://www.linkedin.com/chris-e-larkin
   - icon: academicons/google-scholar
-    url: https://scholar.google.com/
+    url: https://scholar.google.com/citations?hl=en&user=_PJFo20AAAAJ&view_op=list_works&sortby=pubdate
   - icon: academicons/orcid
-    url: https://orcid.org/
+    url: https://orcid.org/0000-0003-3780-6721
 
 interests:
-  - Artificial Intelligence
-  - Computational Linguistics
-  - Information Retrieval
+  - Behavioural economics
+  - Public policy
+  - Causal inference 
+  - Voter turnout
 
 education:
-  - area: PhD Artificial Intelligence
-    institution: Stanford University
-    date_start: 2016-01-01
-    date_end: 2020-12-31
+  - area: PhD Economics
+    institution: Birkbeck College, University of London
+    date_start: 2020-03-01
+    date_end: 2025-03-31
     summary: |
-      Thesis on _Why LLMs are awesome_. Supervised by [Prof Joe Smith](https://example.com). Presented papers at 5 IEEE conferences with the contributions being published in 2 Springer journals.
+      Thesis on _Exploring the behavioural and pyschological underpinnings of voting_. Supervised by [Prof David Schroeder](https://example.com). Completed part-time while working full-time with papers being published in 2 leading journals.
     button:
       text: 'Read Thesis'
       url: 'https://example.com'
-  - area: MEng Artificial Intelligence
-    institution: Massachusetts Institute of Technology
-    date_start: 2016-01-01
-    date_end: 2020-12-31
+  - area: MSc Political Science and Political Economy
+    institution: London School of Economics and Political Science
+    date_start: 2013-09-01
+    date_end: 2014-10-01
     summary: |
-      GPA: 3.8/4.0
+      Courses included:
+      - Game theory
+      - Causal inference with experimental and observational data
+      - Regression modelling
+      - The politics of monetary policy
+  - area: BA International Studies
+    institution: Soka University of America
+    date_start: 2009-01-09
+    date_end: 2013-05-31
+    summary: |
 
-      Courses included:
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - area: BSc Artificial Intelligence
-    institution: Massachusetts Institute of Technology
-    date_start: 2016-01-01
-    date_end: 2020-12-31
-    summary: |
-      GPA: 3.4/4.0
-      
-      Courses included:
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
-      - lorem ipsum dolor sit amet, consectetur adipiscing elit
 work:
-  - position: Director of Cloud Infrastructure
-    company_name: GenCoin
-    company_url: ''
-    company_logo: ''
-    date_start: 2021-01-01
-    date_end: ''
+  - position: Staff Quantitative UX Researcher
+    company_name: Meta
+    company_url: 'https://meta.com'
+    company_logo: "facebook_logo.svg"
+    date_start: 2021-02-01
+    date_end: 2024-06-30
     summary: |2-
       Responsibilities include:
       - lorem ipsum dolor sit amet, consectetur adipiscing elit
       - lorem ipsum dolor sit amet, consectetur adipiscing elit
       - lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - position: Backend Software Engineer
-    company_name: X
-    company_url: ''
+  - position: Senior Advisor
+    company_name: Behavioural Insights Team
+    company_url: 'https://www.bi.team'
     company_logo: ''
     date_start: 2016-01-01
     date_end: 2020-12-31
@@ -112,7 +105,7 @@ work:
 skills:
   - name: Technical Skills
     items:
-      - name: Python
+      - name: R
         description: ''
         percent: 80
         icon: code-bracket
@@ -122,21 +115,21 @@ skills:
         icon: chart-bar
       - name: SQL
         description: ''
-        percent: 40
+        percent: 50
         icon: circle-stack
   - name: Hobbies
     color: '#eeac02'
     color_border: '#f0bf23'
     items:
-      - name: Hiking
+      - name: Cycling
         description: ''
         percent: 60
         icon: person-simple-walk
-      - name: Cats
+      - name: Running
         description: ''
         percent: 100
         icon: cat
-      - name: Photography
+      - name: Mince pies
         description: ''
         percent: 80
         icon: camera
@@ -144,20 +137,20 @@ skills:
 languages:
   - name: English
     percent: 100
-  - name: Chinese
-    percent: 75
-  - name: Portuguese
-    percent: 25
+  - name: Spanish
+    percent: 65
+  - name: French
+    percent: 10
 
 # Awards.
 #   Add/remove as many awards below as you like.
 #   Only `title`, `awarder`, and `date` are required.
 #   Begin multi-line `summary` with YAML's `|` or `|2-` multi-line prefix and indent 2 spaces below.
 awards:
-  - title: Neural Networks and Deep Learning
-    url: https://www.coursera.org/learn/neural-networks-deep-learning
-    date: '2023-11-25'
-    awarder: Coursera
+  - title: Fellow of the Royal Society of the Arts
+    url: https://www.thersa.org/
+    date: '2011-03-01'
+    awarder: The RSA (Royal Society of Arts, Manufactures and Commerce) 
     icon: coursera
     summary: |
       I studied the foundational concept of neural networks and deep learning. By the end, I was familiar with the significant technological trends driving the rise of deep learning; build, train, and apply fully connected deep neural networks; implement efficient (vectorized) neural networks; identify key parameters in a neural network’s architecture; and apply deep learning to your own applications.
@@ -183,4 +176,4 @@ awards:
 
 ## About Me
 
-Chien Shiung Wu is a professor of artificial intelligence at the Stanford AI Lab. Her research interests include distributed robotics, mobile computing and programmable matter. She leads the Robotic Neurobiology group, which develops self-reconfiguring robots, systems of self-organizing robots, and mobile sensor networks.
+Chris Larkin is a researcher with a focus on understanding the behavioural foundations of public policy. He worked for seven years as a consultant at the Behavioural Insights Team, as one of the first team members in both the London and New York offices, as well as a quantitative user researcher at Meta where he focussed on ad tech and user attitudes towards data sharing.
