@@ -80,7 +80,7 @@ work:
   - position: Staff Quantitative UX Researcher
     company_name: Meta
     company_url: 'https://meta.com'
-    company_logo: 'custom/facebook_logo.svg'
+    company_logo: facebook_logo.svg
     date_start: 2021-02-01
     date_end: 2024-06-30
     summary: |2-
@@ -91,7 +91,7 @@ work:
   - position: Senior Advisor
     company_name: Behavioural Insights Team
     company_url: 'https://www.bi.team'
-    company_logo: 'custom/bit_logo.png'
+    company_logo: bit_logo
     date_start: 2016-01-01
     date_end: 2020-12-31
     summary: |
@@ -151,14 +151,14 @@ awards:
     url: https://www.thersa.org/
     date: '2011-03-01'
     awarder: The RSA (Royal Society of Arts, Manufactures and Commerce) 
-    icon: 'custom/rsa_logo'
+    icon: custom/rsa_logo
     summary: |
       Fellows are committed to inspiring better ways of thinking, acting and delivering change. An integral part of the RSA in creating a better future, Fellows champion new ideas, drive social change, deliver practical solutions and support the RSA mission.
-  - title: Blockchain Fundamentals
-    url: https://www.edx.org/professional-certificate/uc-berkeleyx-blockchain-fundamentals
-    date: '2023-07-01'
-    awarder: edX
-    icon: edx
+  - title: ONS Accredited Researcher
+    url: https://uksa.statisticsauthority.gov.uk/digitaleconomyact-research-statistics/better-useofdata-for-research-information-for-researchers/list-of-accredited-researchers-and-research-projects-under-the-research-strand-of-the-digital-economy-act/
+    date: '2016-01-01'
+    awarder: Office for National Statistics
+    icon: custom/ons_logo
     summary: |
       Learned:
       - Synthesize your own blockchain solutions
