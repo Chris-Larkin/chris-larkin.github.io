@@ -31,7 +31,7 @@ featured: false
 
 links:
 # - name: ""
-- url: "https://www.nature.com/articles/s41562-023-01761-z"
+url: https://www.nature.com/articles/s41562-023-01761-z
 url_pdf: https://nrs.harvard.edu/URN-3:HUL.INSTREPOS:37374153
 url_code: https://osf.io/akh9b/
 url_dataset: https://osf.io/kb5t8/
