@@ -64,19 +64,9 @@ sections:
     design:
       view: citation
   - block: collection
-    id: talks
+    id: posts
     content:
-      title: Recent & Upcoming Talks
-      filters:
-        folders:
-          - event
-    design:
-      view: article-grid
-      columns: 1
-  - block: collection
-    id: news
-    content:
-      title: Recent News
+      title: Posts
       subtitle: ''
       text: ''
       # Page type to display. E.g. post, talk, publication...
