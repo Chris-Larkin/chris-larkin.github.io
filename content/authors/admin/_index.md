@@ -160,10 +160,7 @@ awards:
     awarder: Office for National Statistics
     icon: ons_logo
     summary: |
-      Learned:
-      - Synthesize your own blockchain solutions
-      - Gain an in-depth understanding of the specific mechanics of Bitcoin
-      - Understand Bitcoin’s real-life applications and learn how to attack and destroy Bitcoin, Ethereum, smart contracts and Dapps, and alternatives to Bitcoin’s Proof-of-Work consensus algorithm
+      Being an accredited researcher means that I have completed the ONS training to work with secure data in a controlled research environment. The certification allows researchers to carry out analysis and produce outputs using sensitive and non-public data collected by the ONS and other public sector organisations.
 ---
 
 ## About Me
