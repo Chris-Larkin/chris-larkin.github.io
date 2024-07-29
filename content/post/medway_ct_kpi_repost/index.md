@@ -40,7 +40,6 @@ What we were looking for here, was whether or not the localness of the tax - a c
 
 To investigate this, we cut our data to make it as similar as we could to Hallsworth’s original study - by removing the very high and very low debts at the top and bottom. We ended up with a group of households that were in our study, but which had the same average debt - and the same variety of debts - as in the other study. When we analysed the effects of our interventions for that cohort, the effect of the social norms intervention jumped again - this time to 14.05%.
 
-      image: 
-        filename: graph_council_tax.jpg
+![Image alt](images/graph_council_tax.jpg)
 
 If the differences in the two groups were driving the disparity in the results, we would have expected the opposite to happen. This means that, there is indicative - although not conclusive - evidence that when it comes to tax compliance, people really do care about keeping up with the other people in the local area, and their own communities.
