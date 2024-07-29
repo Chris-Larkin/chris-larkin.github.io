@@ -29,10 +29,10 @@ tags:
   - Behavioural Science
 featured: false
 
-# links:
+links:
 # - name: ""
-#   url: ""
-url_pdf: https://journal-bpa.org/index.php/jbpa/article/view/54
+- url: "https://journal-bpa.org/index.php/jbpa/article/view/54"
+url_pdf: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3167575
 url_code: ''
 url_dataset: ''
 url_poster: ''
