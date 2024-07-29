@@ -29,7 +29,7 @@ tags:
   - Behavioural Science
 featured: false
 
-# links:
+links:
 # - name: ""
 - url: "https://www.nature.com/articles/s41562-023-01761-z"
 url_pdf: https://nrs.harvard.edu/URN-3:HUL.INSTREPOS:37374153
