@@ -1,6 +1,28 @@
 <script>
     console.log('Smooth scroll script loaded and running');
     
+    function smoothScroll(e) {
+        const href = this.getAttribute('href');
+        console.log('Clicked link:', href);
+    
+        if (href === '/#papers' || href === '/#news' || href === '/#contact') {
+            e.preventDefault();
+            console.log('Preventing default behavior for:', href);
+    
+            const targetId = href.replace('/#', '');
+            const targetElement = document.getElementById(targetId);
+    
+            if (targetElement) {
+                console.log('Scrolling to:', targetId);
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            } else {
+                console.log('Target element not found:', targetId);
+            }
+        }
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
         console.log('DOM fully loaded');
         const menuLinks = document.querySelectorAll('nav a[href^="/#"]');
@@ -8,31 +30,7 @@
     
         menuLinks.forEach(link => {
             console.log('Adding listener to:', link.href);
-            link.addEventListener('click', function(e) {
-                const href = this.getAttribute('href');
-                console.log('Clicked link:', href);
-    
-                // Only apply smooth scroll to Research, Posts, and Contact
-                if (href !== '/#papers' && href !== '/#news' && href !== '/#contact') {
-                    console.log('Skipping smooth scroll for:', href);
-                    return;
-                }
-    
-                e.preventDefault();
-                console.log('Preventing default behavior for:', href);
-    
-                const targetId = href.replace('/#', '');
-                const targetElement = document.getElementById(targetId);
-    
-                if (targetElement) {
-                    console.log('Scrolling to:', targetId);
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                } else {
-                    console.log('Target element not found:', targetId);
-                }
-            });
+            link.addEventListener('click', smoothScroll);
         });
     });
     </script>
