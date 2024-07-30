@@ -1,25 +1,35 @@
+console.log('Smooth scroll script loaded and running');
+
 document.addEventListener('DOMContentLoaded', function() {
-    const menuLinks = document.querySelectorAll('nav a');
-    
+    console.log('DOM fully loaded');
+    const menuLinks = document.querySelectorAll('nav a[href^="#"]');
+    console.log('Found menu links:', menuLinks.length);
+
     menuLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        
-        // Skip smooth scroll for external links, Home, and CV
-        if (!href.startsWith('#') || href === '#' || this.classList.contains('no-smooth-scroll')) {
-          return;
-        }
-        
-        e.preventDefault();
-        
-        const targetId = href.replace('#', '');
-        const targetElement = document.getElementById(targetId);
-        
-        if (targetElement) {
-          targetElement.scrollIntoView({
-            behavior: 'smooth'
-          });
-        }
-      });
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            console.log('Clicked link:', href);
+
+            // Only apply smooth scroll to Research, Posts, and Contact
+            if (href !== '#papers' && href !== '#news' && href !== '#contact') {
+                console.log('Skipping smooth scroll for:', href);
+                return;
+            }
+
+            e.preventDefault();
+            console.log('Preventing default behavior for:', href);
+
+            const targetId = href.replace('#', '');
+            const targetElement = document.getElementById(targetId);
+
+            if (targetElement) {
+                console.log('Scrolling to:', targetId);
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            } else {
+                console.log('Target element not found:', targetId);
+            }
+        });
     });
-  });
+});
