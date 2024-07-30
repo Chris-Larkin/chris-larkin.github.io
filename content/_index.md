@@ -82,7 +82,7 @@ sections:
       # Reduce spacing
       spacing:
         padding: [0, 0, 0, 0]
-  - block: contact
+  - block: markdown
     id: contact
     content:
       title: Contact
