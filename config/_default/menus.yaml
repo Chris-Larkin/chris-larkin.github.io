@@ -7,6 +7,8 @@ main:
   - name: Home
     url: /
     weight: 10
+    params:
+      class: no-smooth-scroll
   - name: Research
     url: /#papers
     weight: 11
@@ -16,9 +18,12 @@ main:
   - name: CV
     url: experience/
     weight: 20
+    params:
+      class: no-smooth-scroll
   - name: Projects
     url: projects/
     weight: 30
   - name: Contact
     url: /#contact
-    weight: 60  
+    weight: 60
+
