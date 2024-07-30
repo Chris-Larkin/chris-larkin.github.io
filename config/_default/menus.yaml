@@ -19,3 +19,6 @@ main:
   - name: Projects
     url: projects/
     weight: 30
+  - name: Contact
+    url: /#contact
+    weight: 60  
