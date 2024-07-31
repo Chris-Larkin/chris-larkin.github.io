@@ -5,11 +5,10 @@ window.addEventListener('load', function() {
       const href = this.getAttribute('href');
       console.log('Clicked link:', href);
   
-      if (href.startsWith('/#')) {
+      // Check if the link is to a section on the current page
+      if (href.startsWith('#')) {
         e.preventDefault();
-        console.log('Preventing default behavior for:', href);
-  
-        const targetId = href.replace('/#', '');
+        const targetId = href.substring(1);
         const targetElement = document.getElementById(targetId);
   
         if (targetElement) {
@@ -20,10 +19,15 @@ window.addEventListener('load', function() {
         } else {
           console.log('Target element not found:', targetId);
         }
+      } 
+      // Check if the link is to a section on the home page
+      else if (href.startsWith('/#')) {
+        e.preventDefault();
+        window.location.href = href;
       }
     }
   
-    const menuLinks = document.querySelectorAll('a[href^="/#"]');
+    const menuLinks = document.querySelectorAll('nav a');
     console.log('Found menu links:', menuLinks.length);
   
     menuLinks.forEach(link => {
