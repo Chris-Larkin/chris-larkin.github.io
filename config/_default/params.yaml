@@ -35,7 +35,7 @@ header:
     show_search: true
     show_theme_chooser: true
     logo:
-      text: "Your Name"
+      text: "Chris Larkin"
 
 # Site footer
 footer:
@@ -58,3 +58,7 @@ features:
     enable: false
   privacy_pack:
     enable: false
+
+# Append custom JavaScript
+plugins_js: 
+  - custom
