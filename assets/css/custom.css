@@ -1,6 +1,0 @@
-/* Target the navigation menu container */
-nav .navbar-menu {
-    display: flex;             /* Use flexbox layout */
-    justify-content: flex-end; /* Align items to the right */
-    padding-right: 20px;       /* Optional: Add some padding from the right edge */
-}
