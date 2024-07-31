@@ -5,9 +5,9 @@ window.addEventListener('load', function() {
       const href = this.getAttribute('href');
       console.log('Clicked link:', href);
   
-      if (href.startsWith('/#')) {
+      if (href === '/' || href.startsWith('/#')) {
         e.preventDefault();
-        console.log('Navigating to home page section:', href);
+        console.log('Handling navigation for:', href);
         
         // If we're not on the home page, navigate there first
         if (window.location.pathname !== '/') {
@@ -15,21 +15,25 @@ window.addEventListener('load', function() {
           return;
         }
   
-        // We're on the home page, so scroll to the section
-        const targetId = href.substring(2); // Remove '/#'
-        const targetElement = document.getElementById(targetId);
+        // We're on the home page, so scroll to the section or top
+        const targetId = href === '/' ? 'top' : href.substring(2); // Remove '/#' or use 'top' for home
+        const targetElement = targetId === 'top' ? document.body : document.getElementById(targetId);
         if (targetElement) {
           console.log('Scrolling to:', targetId);
-          targetElement.scrollIntoView({
-            behavior: 'smooth'
-          });
+          setTimeout(() => {
+            if (targetId === 'top') {
+              window.scrollTo({top: 0, behavior: 'smooth'});
+            } else {
+              targetElement.scrollIntoView({behavior: 'smooth'});
+            }
+          }, 100); // 100ms delay
         } else {
           console.log('Target element not found:', targetId);
         }
       }
     }
   
-    const menuLinks = document.querySelectorAll('nav a[href^="/#"]');
+    const menuLinks = document.querySelectorAll('nav a');
     console.log('Found menu links:', menuLinks.length);
   
     menuLinks.forEach(link => {
