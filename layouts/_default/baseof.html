@@ -18,17 +18,12 @@
     {{ end }}
 
     <!-- Include any additional CSS files if needed -->
-    <!-- Example: <link rel="stylesheet" href="{{ "css/other-styles.css" | relURL }}"> -->
-
     {{ block "head" . }}{{ end }}
 </head>
 <body>
     <!-- Main content block where page-specific content will be inserted -->
     {{ block "main" . }}
     {{ end }}
-
-    <!-- Footer -->
-    {{ partial "footer.html" . }}
 
     <!-- Scripts -->
     <script src="{{ "js/custom.js" | relURL }}"></script>
