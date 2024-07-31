@@ -5,12 +5,19 @@ window.addEventListener('load', function() {
       const href = this.getAttribute('href');
       console.log('Clicked link:', href);
   
-      // Check if the link is to a section on the current page
-      if (href.startsWith('#')) {
+      if (href.startsWith('/#')) {
         e.preventDefault();
-        const targetId = href.substring(1);
-        const targetElement = document.getElementById(targetId);
+        console.log('Navigating to home page section:', href);
+        
+        // If we're not on the home page, navigate there first
+        if (window.location.pathname !== '/') {
+          window.location.href = href;
+          return;
+        }
   
+        // We're on the home page, so scroll to the section
+        const targetId = href.substring(2); // Remove '/#'
+        const targetElement = document.getElementById(targetId);
         if (targetElement) {
           console.log('Scrolling to:', targetId);
           targetElement.scrollIntoView({
@@ -19,34 +26,10 @@ window.addEventListener('load', function() {
         } else {
           console.log('Target element not found:', targetId);
         }
-      } 
-      // Check if the link is to a section on the home page
-      else if (href.startsWith('/#')) {
-        e.preventDefault();
-        console.log('Navigating to home page section:', href);
-        
-        // Navigate to the home page
-        window.location.href = '/';
-  
-        // After a short delay, scroll to the section
-        setTimeout(() => {
-          const targetId = href.substring(2); // Remove '/#'
-          const targetElement = document.getElementById(targetId);
-          if (targetElement) {
-            console.log('Scrolling to:', targetId);
-            targetElement.scrollIntoView({
-              behavior: 'smooth'
-            });
-          } else {
-            console.log('Target element not found:', targetId);
-          }
-        }, 100); // Adjust this delay if needed
-      } else {
-        console.log('Regular navigation to:', href);
       }
     }
   
-    const menuLinks = document.querySelectorAll('nav a');
+    const menuLinks = document.querySelectorAll('nav a[href^="/#"]');
     console.log('Found menu links:', menuLinks.length);
   
     menuLinks.forEach(link => {
