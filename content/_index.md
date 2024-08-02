@@ -59,7 +59,7 @@ sections:
         author: ""
         category: ""
 
- - block: markdown
+  - block: markdown
     id: contact
     content:
       title: Contact
