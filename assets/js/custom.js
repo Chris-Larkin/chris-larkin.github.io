@@ -53,9 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log(`Processing section ${index}:`, section.textContent);
         
-        section.classList.add('vertical-title');
+        section.classList.add('section-title');
         
-        console.log(`Converted to vertical title: "${section.textContent}"`);
+        console.log(`Added class to: "${section.textContent}"`);
     });
 
     console.log('Finished processing all sections');

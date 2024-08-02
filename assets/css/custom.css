@@ -1,15 +1,5 @@
-.vertical-title {
-    position: absolute !important;
-    left: -60px !important; /* Adjust this value as needed */
-    writing-mode: vertical-rl !important;
-    transform: rotate(180deg) !important;
-    font-size: 1.5rem !important;
-    font-weight: bold !important;
-    margin-top: -1.5rem !important; /* Adjust this value as needed */
-    z-index: 10 !important; /* Ensure it's above other elements */
-    text-align: right !important; /* Align text to the right side of the vertical line */
-}
-
-.vertical-title + * {
-    margin-left: 40px !important; /* Add space for the vertical title */
+.section-title {
+    /* No positioning changes yet, just a visual indicator */
+    border: 2px solid red;
+    padding: 5px;
 }
