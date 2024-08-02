@@ -1,11 +1,13 @@
-.section-heading {
+.vertical-title {
     position: absolute;
-    left: 0;
+    left: -60px; /* Adjust as needed */
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    margin-left: -260px; /* Adjust as needed */
-  }
-  
-  .section-content {
-    margin-left: 40px; /* Adjust to create space for the title */
-  }
+    font-size: 1.5em; /* Adjust as needed */
+    font-weight: bold;
+    color: #333; /* Adjust color as needed */
+}
+
+.section-heading {
+    margin-left: 40px; /* Create space for the vertical title */
+}

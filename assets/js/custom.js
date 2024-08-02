@@ -1,3 +1,5 @@
+// ADD SMOOTH SCROLL FUNCTIONALITY TO DIFFERENT PARTS OF HOME PAGE
+
 // Execute when the DOM is fully loaded
 window.addEventListener('load', function() {
     function handleNavigation(e) {
@@ -36,3 +38,30 @@ window.addEventListener('load', function() {
       link.addEventListener('click', handleNavigation);
     });
   });
+
+// MOVE SECTION TITLES TO LEFT OF HOME SCREEN
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM fully loaded and parsed');
+  
+  const sections = document.querySelectorAll('.section-heading');
+  console.log('Found', sections.length, 'section headings');
+  
+  sections.forEach((section, index) => {
+      console.log(`Processing section ${index + 1}:`, section.textContent);
+      
+      const title = section.textContent;
+      const newTitle = document.createElement('div');
+      newTitle.textContent = title;
+      newTitle.className = 'vertical-title';
+      
+      console.log(`Created new vertical title for "${title}"`);
+      
+      section.parentNode.insertBefore(newTitle, section);
+      console.log(`Inserted new vertical title before original heading`);
+      
+      section.style.visibility = 'hidden';
+      console.log(`Set original heading to hidden`);
+  });
+
+  console.log('Finished processing all sections');
+});
