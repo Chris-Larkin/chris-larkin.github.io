@@ -45,12 +45,12 @@ console.log('Custom JS file loaded');
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
     
-    // Target both potential section title classes
     const sections = document.querySelectorAll('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold');
     console.log('Found', sections.length, 'section headings');
     
     sections.forEach((section, index) => {
-        if (index === 0) return; // Skip the first one (likely the main title)
+        // Skip the CV section by checking the closest parent element's class list
+        if (section.closest('.flex.flex-col.lg\\:gap-x-6.w-100.px-6.sm\\:px-0')) return;
         
         console.log(`Processing section ${index}:`, section.textContent);
         
@@ -82,3 +82,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('Finished processing all sections');
 });
+

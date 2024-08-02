@@ -5,13 +5,12 @@
 }
 
 .section-title {
-    position: sticky;
-    top: 20px; /* Adjust this value to set how far from the top the title should stick */
+    position: absolute;
     left: 0;
+    top: 0;
     width: 130px; /* Adjust as needed */
     text-align: right;
     padding-right: 20px;
-    /* Preserve original styling */
     font-size: 1.875rem !important; /* text-3xl */
     font-weight: bold !important;
     color: inherit !important;
@@ -21,10 +20,16 @@
     width: 100%;
 }
 
-/* Target the flex container */
 .flex.flex-col.items-center.max-w-prose.mx-auto.gap-3.justify-center,
 .items-center.max-w-prose.mx-auto {
     align-items: flex-start !important;
     max-width: none !important;
     padding: 0 20px;
+}
+
+/* Ensure the CV section remains unaffected */
+.flex.flex-col.items-center.max-w-prose.mx-auto .flex.flex-col.lg\\:gap-x-6.w-100.px-6.sm\\:px-0 {
+    padding-left: 0 !important;
+    max-width: initial !important;
+    align-items: center !important;
 }
