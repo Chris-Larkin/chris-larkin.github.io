@@ -12,9 +12,9 @@
     text-align: right;
     padding-right: 20px;
     /* Preserve original styling */
-    font-size: 1.875rem; /* text-3xl */
-    font-weight: bold;
-    color: inherit;
+    font-size: 1.875rem !important; /* text-3xl */
+    font-weight: bold !important;
+    color: inherit !important;
 }
 
 /* Ensure content doesn't overlap with title */
@@ -23,8 +23,9 @@
 }
 
 /* Target the flex container */
-.flex.flex-col.items-center.max-w-prose.mx-auto.gap-3.justify-center {
-    align-items: flex-start;
-    max-width: none;
+.flex.flex-col.items-center.max-w-prose.mx-auto.gap-3.justify-center,
+.items-center.max-w-prose.mx-auto {
+    align-items: flex-start !important;
+    max-width: none !important;
     padding: 0 20px;
 }

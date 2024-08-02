@@ -45,17 +45,20 @@ console.log('Custom JS file loaded');
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
     
-    const sections = document.querySelectorAll('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white');
+    // Target both potential section title classes
+    const sections = document.querySelectorAll('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold');
     console.log('Found', sections.length, 'section headings');
     
     sections.forEach((section, index) => {
+        if (index === 0) return; // Skip the first one (likely the main title)
+        
         console.log(`Processing section ${index}:`, section.textContent);
         
         const container = document.createElement('div');
         container.className = 'section-container';
         
         // Move the section title into the container
-        container.appendChild(section);
+        container.appendChild(section.cloneNode(true));
         section.classList.add('section-title');
         
         // Create a div for the content
@@ -65,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Move all following siblings until the next section into this container
         let nextElement = section.nextElementSibling;
-        while (nextElement && !nextElement.matches('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white')) {
+        while (nextElement && !nextElement.matches('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold')) {
             const temp = nextElement.nextElementSibling;
             contentDiv.appendChild(nextElement);
             nextElement = temp;
