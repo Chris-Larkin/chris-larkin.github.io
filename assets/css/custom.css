@@ -1,9 +1,11 @@
+/* General section container styles */
 .section-container {
     position: relative;
     padding-left: 150px; /* Adjust as needed */
     margin-bottom: 4rem; /* Space between sections */
 }
 
+/* Section title styles */
 .section-title {
     position: absolute;
     left: 0;
@@ -16,13 +18,16 @@
     color: inherit !important;
 }
 
+/* Section content styles */
 .section-content {
     width: 100%;
 }
 
-.flex.flex-col.items-center.max-w-prose.mx-auto,
-.flex.flex-col.items-center.max-w-prose.mx-auto .flex.flex-col.lg\:gap-x-6.w-100.px-6.sm\:px-0 {
-    align-items: center !important;
-    padding-left: 0 !important;
+/* Center alignment for CV page content */
+.cv-content-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     max-width: initial !important;
+    padding-left: 0 !important;
 }
