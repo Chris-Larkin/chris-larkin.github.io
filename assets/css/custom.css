@@ -22,12 +22,3 @@
 .section-content {
     width: 100%;
 }
-
-/* Center alignment for CV page content */
-.cv-content-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    max-width: initial !important;
-    padding-left: 0 !important;
-}

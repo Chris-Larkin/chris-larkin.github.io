@@ -47,42 +47,40 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('Found', sections.length, 'section headings');
   
   sections.forEach((section, index) => {
-      // Skip sections on the home page
-      if (document.body.classList.contains('home-page')) return;
-
-      // Specific handling for CV page sections
-      if (section.closest('#cv-page')) {
-          const container = document.createElement('div');
-          container.className = 'section-container';
-          
-          // Move the section title into the container
-          container.appendChild(section.cloneNode(true));
-          section.classList.add('section-title');
-          
-          // Create a div for the content
-          const contentDiv = document.createElement('div');
-          contentDiv.className = 'section-content';
-          container.appendChild(contentDiv);
-          
-          // Move all following siblings until the next section into this container
-          let nextElement = section.nextElementSibling;
-          while (nextElement && !nextElement.matches('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold')) {
-              const temp = nextElement.nextElementSibling;
-              contentDiv.appendChild(nextElement);
-              nextElement = temp;
-          }
-          
-          // Replace the original section with our new container
-          section.parentNode.replaceChild(container, section);
-      } else {
-          // Ensure CV sections have centered content
-          section.closest('.flex.flex-col.items-center.max-w-prose.mx-auto').classList.add('cv-content-center');
+      // Exclude CV sections based on their container's ID or class
+      if (section.closest('#cv-page') || section.closest('.blox-resume-skills') || section.closest('.blox-resume-awards')) {
+          return;
       }
+
+      // Proceed with modifications for other sections
+      const container = document.createElement('div');
+      container.className = 'section-container';
+      
+      // Move the section title into the container
+      container.appendChild(section.cloneNode(true));
+      section.classList.add('section-title');
+      
+      // Create a div for the content
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'section-content';
+      container.appendChild(contentDiv);
+      
+      // Move all following siblings until the next section into this container
+      let nextElement = section.nextElementSibling;
+      while (nextElement && !nextElement.matches('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold')) {
+          const temp = nextElement.nextElementSibling;
+          contentDiv.appendChild(nextElement);
+          nextElement = temp;
+      }
+      
+      // Replace the original section with our new container
+      section.parentNode.replaceChild(container, section);
 
       console.log(`Processed: "${section.textContent.trim()}"`);
   });
 
   console.log('Finished processing all sections');
 });
+
 
 
