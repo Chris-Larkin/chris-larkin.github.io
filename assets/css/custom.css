@@ -5,9 +5,9 @@
 }
 
 .section-title {
-    position: absolute;
+    position: sticky;
+    top: 20px; /* Adjust this value to set how far from the top the title should stick */
     left: 0;
-    top: 0;
     width: 130px; /* Adjust as needed */
     text-align: right;
     padding-right: 20px;
@@ -17,7 +17,6 @@
     color: inherit !important;
 }
 
-/* Ensure content doesn't overlap with title */
 .section-content {
     width: 100%;
 }
