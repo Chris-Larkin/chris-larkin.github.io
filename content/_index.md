@@ -39,8 +39,7 @@ sections:
         folders:
           - project
     design:
-      view: article-grid
-      fill_image: true
+      view: compact
       columns: 1
   - block: collection
     id: news
