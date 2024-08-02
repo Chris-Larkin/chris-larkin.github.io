@@ -1,12 +1,25 @@
  /* Move section heading to the left */
-.section-heading {
+  .section-heading-left {
     position: absolute;
     left: 0;
     writing-mode: vertical-rl;
     transform: rotate(180deg);
     margin-left: -60px; /* Adjust this value as needed */
   }
-  
-  .section-content {
+
+  .section-content-left {
     margin-left: 40px; /* Adjust this value to create space for the title */
+  }
+
+  /* Target specific sections */
+  #papers .section-heading-left,
+  #news .section-heading-left,
+  #contact .section-heading-left {
+    /* Additional styles specific to these sections if needed */
+  }
+
+  #papers .section-content-left,
+  #news .section-content-left,
+  #contact .section-content-left {
+    /* Additional styles specific to these sections if needed */
   }

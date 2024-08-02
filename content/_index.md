@@ -30,6 +30,7 @@ sections:
           size: cover
           position: center
           parallax: false
+
   - block: collection
     id: papers
     content:
@@ -41,6 +42,8 @@ sections:
     design:
       view: compact
       columns: 1
+      css_class: section-content-left #section title on LHS
+
   - block: collection
     id: news
     content:
@@ -70,10 +73,14 @@ sections:
       # Reduce spacing
       spacing:
         padding: [0, 0, 0, 0]
+      css_class: section-content-left #section title on LHS
+
   - block: markdown
     id: contact
     content:
       title: Contact
       subtitle: ''
       text: ''
+    design:
+      css_class: section-content-left #section title on LHS
 ---
