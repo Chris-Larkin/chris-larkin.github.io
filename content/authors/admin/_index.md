@@ -163,4 +163,6 @@ awards:
       Being an accredited researcher means that I have completed the ONS training to work with secure data in a controlled research environment. The certification allows researchers to carry out analysis and produce outputs using sensitive and non-public data collected by the ONS and other public sector organisations.
 ---
 
+## About Me
+
 Chris Larkin is a researcher with a focus on understanding the behavioural foundations of public policy. He worked for seven years as a consultant at the Behavioural Insights Team, as one of the first team members in both the London and New York offices, as well as a quantitative user researcher at Meta where he focussed on ad tech and user attitudes towards data sharing.
