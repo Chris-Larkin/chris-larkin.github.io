@@ -1,14 +1,14 @@
 .section-container {
     position: relative;
-    padding-left: 120px; /* Space for the titles */
-    margin-bottom: 2rem; /* Space between sections */
+    padding-left: 150px; /* Adjust as needed */
+    margin-bottom: 4rem; /* Space between sections */
 }
 
 .section-title {
     position: absolute;
     left: 0;
     top: 0;
-    width: 100px; /* Adjust as needed */
+    width: 130px; /* Adjust as needed */
     text-align: right;
     padding-right: 20px;
     /* Preserve original styling */
@@ -20,4 +20,11 @@
 /* Ensure content doesn't overlap with title */
 .section-content {
     width: 100%;
+}
+
+/* Target the flex container */
+.flex.flex-col.items-center.max-w-prose.mx-auto.gap-3.justify-center {
+    align-items: flex-start;
+    max-width: none;
+    padding: 0 20px;
 }

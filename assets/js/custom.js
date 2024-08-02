@@ -45,19 +45,16 @@ console.log('Custom JS file loaded');
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
     
-    const sections = document.querySelectorAll('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold');
+    const sections = document.querySelectorAll('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white');
     console.log('Found', sections.length, 'section headings');
     
     sections.forEach((section, index) => {
-        if (index === 0) return; // Skip the first one (Chris Larkin)
-        
         console.log(`Processing section ${index}:`, section.textContent);
         
         const container = document.createElement('div');
         container.className = 'section-container';
-        section.parentNode.insertBefore(container, section);
         
-        // Move the original section title into the container
+        // Move the section title into the container
         container.appendChild(section);
         section.classList.add('section-title');
         
@@ -66,13 +63,16 @@ document.addEventListener('DOMContentLoaded', function() {
         contentDiv.className = 'section-content';
         container.appendChild(contentDiv);
         
-        // Move all content until the next section into this container
+        // Move all following siblings until the next section into this container
         let nextElement = section.nextElementSibling;
-        while (nextElement && !nextElement.matches('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold')) {
+        while (nextElement && !nextElement.matches('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white')) {
             const temp = nextElement.nextElementSibling;
             contentDiv.appendChild(nextElement);
             nextElement = temp;
         }
+        
+        // Replace the original section with our new container
+        section.parentNode.replaceChild(container, section);
         
         console.log(`Processed: "${section.textContent.trim()}"`);
     });
