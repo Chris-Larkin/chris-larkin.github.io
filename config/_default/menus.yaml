@@ -9,8 +9,10 @@ main:
     weight: 10
     params:
       class: no-smooth-scroll
+main:
   - name: Research
-    url: /#papers
+    url: research/
+    weight: 11
     weight: 11
   - name: Posts
     url: /#news

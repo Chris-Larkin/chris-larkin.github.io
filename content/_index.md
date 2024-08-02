@@ -33,14 +33,15 @@ sections:
   - block: collection
     id: papers
     content:
-      title: Research  # Changed from 'Publications' to 'Research'
-      text: ""
+      title: Research
+      text: Here you can add a brief description of your research activities.
       filters:
         folders:
           - publication
-        exclude_featured: false
     design:
-      view: citation
+      view: article-grid
+      fill_image: false
+      columns: 3
   - block: collection
     id: news
     content:
