@@ -33,7 +33,7 @@ sections:
   - block: collection
     id: papers
     content:
-      title: Publications
+      title: Research  # Changed from 'Publications' to 'Research'
       text: ""
       filters:
         folders:

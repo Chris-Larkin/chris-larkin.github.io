@@ -20,9 +20,6 @@ main:
     weight: 20
     params:
       class: no-smooth-scroll
-  - name: Projects
-    url: projects/
-    weight: 30
   - name: Contact
     url: /#contact
     weight: 60
