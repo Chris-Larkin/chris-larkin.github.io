@@ -21,7 +21,7 @@ main:
     params:
       class: no-smooth-scroll
   - name: Projects
-    url: /#projects
+    url: projects/
     weight: 30
   - name: Contact
     url: /#contact
