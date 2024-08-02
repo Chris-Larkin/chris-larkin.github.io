@@ -45,25 +45,17 @@ console.log('Custom JS file loaded');
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
     
-    const sections = document.querySelectorAll('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white');
-    console.log('Found', sections.length, 'section headings');
+    // Log all elements with 'text-3xl' class for debugging
+    const allLargeText = document.querySelectorAll('.text-3xl');
+    console.log('All large text elements:', allLargeText);
+
+    // Try a less specific selector
+    const sections = document.querySelectorAll('.text-3xl.font-bold');
+    console.log('Found', sections.length, 'potential section headings');
     
     sections.forEach((section, index) => {
-        console.log(`Processing section ${index + 1}:`, section.textContent);
-        
-        const title = section.textContent;
-        const newTitle = document.createElement('div');
-        newTitle.textContent = title;
-        newTitle.className = 'vertical-title';
-        
-        console.log(`Created new vertical title for "${title}"`);
-        
-        section.parentNode.insertBefore(newTitle, section);
-        console.log(`Inserted new vertical title before original heading`);
-        
-        section.style.visibility = 'hidden';
-        console.log(`Set original heading to hidden`);
+        console.log(`Potential heading ${index + 1}:`, section.textContent);
     });
 
-    console.log('Finished processing all sections');
+    console.log('Finished scanning for headings');
 });
