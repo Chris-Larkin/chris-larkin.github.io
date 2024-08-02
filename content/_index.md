@@ -58,5 +58,10 @@ sections:
       filters:
         author: ""
         category: ""
-   
+
+  - block: contact
+    id: contact
+    content:
+      subtitle: ''
+      text: ''
 ---
