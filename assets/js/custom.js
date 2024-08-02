@@ -49,8 +49,8 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Found', sections.length, 'section headings');
     
     sections.forEach((section, index) => {
-        // Skip the CV section by checking the closest parent element's class list
-        if (section.closest('.flex.flex-col.lg\\:gap-x-6.w-100.px-6.sm\\:px-0')) return;
+        // Skip the CV section by checking the parent elements' class list
+        if (section.closest('.flex.flex-col.items-center.max-w-prose.mx-auto')) return;
         
         console.log(`Processing section ${index}:`, section.textContent);
         

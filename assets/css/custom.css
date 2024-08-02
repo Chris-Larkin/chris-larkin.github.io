@@ -20,16 +20,9 @@
     width: 100%;
 }
 
-.flex.flex-col.items-center.max-w-prose.mx-auto.gap-3.justify-center,
-.items-center.max-w-prose.mx-auto {
-    align-items: flex-start !important;
-    max-width: none !important;
-    padding: 0 20px;
-}
-
-/* Ensure the CV section remains unaffected */
-.flex.flex-col.items-center.max-w-prose.mx-auto .flex.flex-col.lg\\:gap-x-6.w-100.px-6.sm\\:px-0 {
+.flex.flex-col.items-center.max-w-prose.mx-auto,
+.flex.flex-col.items-center.max-w-prose.mx-auto .flex.flex-col.lg\:gap-x-6.w-100.px-6.sm\:px-0 {
+    align-items: center !important;
     padding-left: 0 !important;
     max-width: initial !important;
-    align-items: center !important;
 }
