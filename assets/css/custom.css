@@ -1,31 +1,11 @@
-/* Move section heading to the left */
-.section-heading-left,
-#papers .section-heading,
-#news .section-heading,
-#contact .section-heading {
-  position: absolute;
-  left: 0;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  margin-left: -60px; /* Adjust this value as needed */
-}
-
-.section-content-left,
-#papers .col-12,
-#news .col-12,
-#contact .col-12 {
-  margin-left: 40px; /* Adjust this value to create space for the title */
-}
-
-/* Target specific sections */
-#papers .section-heading-left,
-#news .section-heading-left,
-#contact .section-heading-left {
-  /* Additional styles specific to these sections if needed */
-}
-
-#papers .section-content-left,
-#news .section-content-left,
-#contact .section-content-left {
-  /* Additional styles specific to these sections if needed */
-}
+.section-heading {
+    position: absolute;
+    left: 0;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    margin-left: -60px; /* Adjust as needed */
+  }
+  
+  .section-content {
+    margin-left: 40px; /* Adjust to create space for the title */
+  }
