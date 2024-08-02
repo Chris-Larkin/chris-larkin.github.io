@@ -53,28 +53,28 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log(`Processing section ${index}:`, section.textContent);
         
-        const title = section.textContent.trim();
         const container = document.createElement('div');
         container.className = 'section-container';
         section.parentNode.insertBefore(container, section);
         
-        const titleElement = document.createElement('div');
-        titleElement.className = 'section-title';
-        titleElement.textContent = title;
-        container.appendChild(titleElement);
+        // Move the original section title into the container
+        container.appendChild(section);
+        section.classList.add('section-title');
+        
+        // Create a div for the content
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'section-content';
+        container.appendChild(contentDiv);
         
         // Move all content until the next section into this container
         let nextElement = section.nextElementSibling;
         while (nextElement && !nextElement.matches('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold')) {
             const temp = nextElement.nextElementSibling;
-            container.appendChild(nextElement);
+            contentDiv.appendChild(nextElement);
             nextElement = temp;
         }
         
-        // Remove the original section title
-        section.remove();
-        
-        console.log(`Processed: "${title}"`);
+        console.log(`Processed: "${section.textContent.trim()}"`);
     });
 
     console.log('Finished processing all sections');

@@ -1,18 +1,23 @@
 .section-container {
     position: relative;
-    padding-left: 100px; /* Space for the titles */
+    padding-left: 120px; /* Space for the titles */
+    margin-bottom: 2rem; /* Space between sections */
 }
 
 .section-title {
     position: absolute;
     left: 0;
-    top: 0; /* We'll adjust this with JavaScript for the scrolling effect */
-    width: 80px; /* Adjust as needed */
+    top: 0;
+    width: 100px; /* Adjust as needed */
     text-align: right;
     padding-right: 20px;
+    /* Preserve original styling */
+    font-size: 1.875rem; /* text-3xl */
+    font-weight: bold;
+    color: inherit;
 }
 
-/* Remove any margins that might interfere */
-.section-title, .section-content {
-    margin: 0;
+/* Ensure content doesn't overlap with title */
+.section-content {
+    width: 100%;
 }
