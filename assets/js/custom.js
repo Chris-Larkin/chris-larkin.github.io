@@ -45,6 +45,7 @@ console.log('Custom JS file loaded');
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
     
+    // Target both potential section title classes
     const sections = document.querySelectorAll('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold');
     console.log('Found', sections.length, 'section headings');
     
@@ -77,25 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
         section.parentNode.replaceChild(container, section);
         
         console.log(`Processed: "${section.textContent.trim()}"`);
-    });
-
-    // Add scroll event listener
-    window.addEventListener('scroll', function() {
-        const scrollPosition = window.scrollY;
-        
-        document.querySelectorAll('.section-container').forEach((container) => {
-            const title = container.querySelector('.section-title');
-            const content = container.querySelector('.section-content');
-            
-            const containerTop = container.offsetTop;
-            const containerBottom = containerTop + container.offsetHeight;
-            
-            if (scrollPosition >= containerTop && scrollPosition < containerBottom) {
-                const maxScroll = content.offsetHeight - title.offsetHeight;
-                const scroll = Math.min(scrollPosition - containerTop, maxScroll);
-                title.style.transform = `translateY(${scroll}px)`;
-            }
-        });
     });
 
     console.log('Finished processing all sections');
