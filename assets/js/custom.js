@@ -40,5 +40,3 @@ window.addEventListener('load', function() {
   });
 
 // MOVE SECTION TITLES TO LEFT OF HOME SCREEN
-
-

@@ -84,3 +84,19 @@ sections:
     design:
       css_class: section-content-left #section title on LHS
 ---
+
+<!-- Add sticky-title class to section titles -->
+<section id="projects">
+  <h2 class="sticky-title">Projects</h2>
+  <!-- Add your projects content here -->
+</section>
+
+<section id="posts">
+  <h2 class="sticky-title">Posts</h2>
+  <!-- Add your posts content here -->
+</section>
+
+<section id="contact">
+  <h2 class="sticky-title">Contact</h2>
+  <!-- Add your contact content here -->
+</section>
