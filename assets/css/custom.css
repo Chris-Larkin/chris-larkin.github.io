@@ -3,11 +3,13 @@
     left: -60px; /* Adjust as needed */
     writing-mode: vertical-rl;
     transform: rotate(180deg);
-    font-size: 1.5em; /* Adjust as needed */
+    font-size: 1.5rem; /* Match the original size */
     font-weight: bold;
-    color: #333; /* Adjust color as needed */
+    color: inherit; /* This will respect dark/light mode */
+    margin-top: -1.5rem; /* Adjust to align with content */
 }
 
-.section-heading {
-    margin-left: 40px; /* Create space for the vertical title */
+/* Add some left margin to the content to make room for the vertical title */
+.mb-6.text-3xl.font-bold.text-gray-900.dark\:text-white {
+    margin-left: 2rem; /* Adjust as needed */
 }
