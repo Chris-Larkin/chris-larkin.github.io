@@ -1,17 +1,5 @@
 .section-title {
-    position: absolute;
-    left: -200px; /* Adjust this value as needed */
-    width: 180px; /* Adjust as needed */
-    text-align: right;
-    padding-right: 20px;
-}
-
-/* Adjust the container of the section content */
-.section-title + * {
-    margin-left: 20px; /* Add some space between the title and content */
-}
-
-/* Ensure the parent container has relative positioning */
-.section-title:not(:first-child) {
-    position: relative;
+    border: 2px solid red; /* This is just a visual indicator */
+    padding: 5px;
+    margin-bottom: 10px;
 }

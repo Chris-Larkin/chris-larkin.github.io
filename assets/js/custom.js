@@ -45,7 +45,7 @@ console.log('Custom JS file loaded');
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
     
-    const sections = document.querySelectorAll('.text-3xl.font-bold');
+    const sections = document.querySelectorAll('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white');
     console.log('Found', sections.length, 'section headings');
     
     sections.forEach((section, index) => {
