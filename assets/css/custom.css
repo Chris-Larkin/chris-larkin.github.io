@@ -1,0 +1,12 @@
+ /* Move section heading to the left */
+.section-heading {
+    position: absolute;
+    left: 0;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    margin-left: -60px; /* Adjust this value as needed */
+  }
+  
+  .section-content {
+    margin-left: 40px; /* Adjust this value to create space for the title */
+  }
