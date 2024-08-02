@@ -1,5 +1,14 @@
 .section-title {
-    border: 2px solid red; /* This is just a visual indicator */
+    border: 2px solid red; /* Keep this for now as a visual indicator */
     padding: 5px;
     margin-bottom: 10px;
+    position: relative;
+    left: -100px; /* Move slightly to the left */
+    width: 200px; /* Give it a fixed width */
+    text-align: right; /* Align text to the right */
+}
+
+/* Add some margin to the content to prevent overlap */
+.section-title + * {
+    margin-left: 110px; /* Slightly more than the 'left' value above */
 }
