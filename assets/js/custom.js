@@ -49,13 +49,32 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Found', sections.length, 'section headings');
     
     sections.forEach((section, index) => {
-        console.log(`Section ${index}:`, section.textContent.trim(), 'Classes:', section.className);
-        
         if (index === 0) return; // Skip the first one (Chris Larkin)
         
-        section.classList.add('section-title');
+        console.log(`Processing section ${index}:`, section.textContent);
         
-        console.log(`Processed: "${section.textContent.trim()}"`);
+        const title = section.textContent.trim();
+        const container = document.createElement('div');
+        container.className = 'section-container';
+        section.parentNode.insertBefore(container, section);
+        
+        const titleElement = document.createElement('div');
+        titleElement.className = 'section-title';
+        titleElement.textContent = title;
+        container.appendChild(titleElement);
+        
+        // Move all content until the next section into this container
+        let nextElement = section.nextElementSibling;
+        while (nextElement && !nextElement.matches('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold')) {
+            const temp = nextElement.nextElementSibling;
+            container.appendChild(nextElement);
+            nextElement = temp;
+        }
+        
+        // Remove the original section title
+        section.remove();
+        
+        console.log(`Processed: "${title}"`);
     });
 
     console.log('Finished processing all sections');

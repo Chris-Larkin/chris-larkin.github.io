@@ -1,19 +1,18 @@
-.section-title {
-    border: 2px solid red; /* We'll keep this for now as a visual indicator */
-    padding: 5px;
-    margin-bottom: 10px;
+.section-container {
     position: relative;
-    left: -220px; /* Move further to the left */
-    width: 200px; /* Keep the width the same */
-    text-align: right; /* Keep text aligned to the right */
+    padding-left: 100px; /* Space for the titles */
 }
 
-/* Adjust the margin for the content to prevent overlap */
-.section-title + * {
-    margin-left: 20px; /* Reduce this to bring content closer to the left edge */
+.section-title {
+    position: absolute;
+    left: 0;
+    top: 0; /* We'll adjust this with JavaScript for the scrolling effect */
+    width: 80px; /* Adjust as needed */
+    text-align: right;
+    padding-right: 20px;
 }
 
-/* Ensure the parent container has enough padding to show the titles */
-.section-title:not(:first-child) {
-    padding-left: 220px; /* Should match the absolute value of 'left' above */
+/* Remove any margins that might interfere */
+.section-title, .section-content {
+    margin: 0;
 }
