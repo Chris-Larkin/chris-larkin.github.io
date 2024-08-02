@@ -53,9 +53,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log(`Processing section ${index}:`, section.textContent);
         
+        const title = section.textContent.trim();
         section.classList.add('section-title');
+        section.setAttribute('data-title', title);
         
-        console.log(`Added class to: "${section.textContent}"`);
+        // Wrap the original text in a span
+        section.innerHTML = `<span>${title}</span>`;
+        
+        console.log(`Processed: "${title}"`);
     });
 
     console.log('Finished processing all sections');

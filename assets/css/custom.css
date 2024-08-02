@@ -1,5 +1,28 @@
 .section-title {
-    /* No positioning changes yet, just a visual indicator */
-    border: 2px solid red;
-    padding: 5px;
+    position: relative;
+    height: 0;
+    overflow: visible;
+    margin: 2rem 0; /* Adjust as needed to match original spacing */
+}
+
+.section-title::before {
+    content: attr(data-title);
+    position: absolute;
+    left: -60px; /* Adjust as needed */
+    top: 50%;
+    transform: translateY(-50%) rotate(180deg);
+    writing-mode: vertical-rl;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: inherit;
+}
+
+/* Hide the original horizontal text */
+.section-title span {
+    display: none;
+}
+
+/* Add space for the vertical titles */
+.section-title + * {
+    margin-left: 40px; /* Adjust as needed */
 }
