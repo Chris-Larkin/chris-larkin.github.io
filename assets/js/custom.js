@@ -45,13 +45,13 @@ console.log('Custom JS file loaded');
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
     
-    const sections = document.querySelectorAll('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white');
+    const sections = document.querySelectorAll('.mb-6.text-3xl.font-bold.text-gray-900.dark\\:text-white, .text-3xl.font-bold');
     console.log('Found', sections.length, 'section headings');
     
     sections.forEach((section, index) => {
-        if (index === 0) return; // Skip the first one (Chris Larkin)
+        console.log(`Section ${index}:`, section.textContent.trim(), 'Classes:', section.className);
         
-        console.log(`Processing section ${index}:`, section.textContent);
+        if (index === 0) return; // Skip the first one (Chris Larkin)
         
         section.classList.add('section-title');
         
