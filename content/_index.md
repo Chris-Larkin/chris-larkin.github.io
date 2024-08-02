@@ -33,15 +33,15 @@ sections:
   - block: collection
     id: papers
     content:
-      title: Research
-      text: Here you can add a brief description of your research activities.
+      title: Projects
+      text:
       filters:
         folders:
-          - publication
+          - project
     design:
       view: article-grid
-      fill_image: false
-      columns: 3
+      fill_image: true
+      columns: 1
   - block: collection
     id: news
     content:
