@@ -53,20 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log(`Processing section ${index}:`, section.textContent);
         
-        const title = section.textContent;
-        const newTitle = document.createElement('div');
-        newTitle.textContent = title;
-        newTitle.className = 'vertical-title';
+        section.classList.add('vertical-title');
         
-        console.log(`Created new vertical title for "${title}"`);
-        
-        section.parentNode.insertBefore(newTitle, section);
-        console.log(`Inserted new vertical title before original heading`);
-        
-        // Comment out this line to keep original titles visible
-        // section.style.visibility = 'hidden';
-        
-        console.log(`Vertical title added for "${title}"`);
+        console.log(`Converted to vertical title: "${section.textContent}"`);
     });
 
     console.log('Finished processing all sections');

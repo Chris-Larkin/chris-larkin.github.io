@@ -1,15 +1,15 @@
 .vertical-title {
-    position: absolute;
-    left: -40px; /* Adjust this value as needed */
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #888; /* Use a different color to distinguish from original titles */
-    margin-top: -1.5rem; /* Adjust this value as needed */
-    z-index: 10; /* Ensure it's above other elements */
+    position: absolute !important;
+    left: -60px !important; /* Adjust this value as needed */
+    writing-mode: vertical-rl !important;
+    transform: rotate(180deg) !important;
+    font-size: 1.5rem !important;
+    font-weight: bold !important;
+    margin-top: -1.5rem !important; /* Adjust this value as needed */
+    z-index: 10 !important; /* Ensure it's above other elements */
+    text-align: right !important; /* Align text to the right side of the vertical line */
 }
 
-.text-3xl.font-bold {
-    position: relative; /* Ensure the original title stays in place */
+.vertical-title + * {
+    margin-left: 40px !important; /* Add space for the vertical title */
 }
