@@ -1,14 +1,19 @@
 .section-title {
-    border: 2px solid red; /* Keep this for now as a visual indicator */
+    border: 2px solid red; /* We'll keep this for now as a visual indicator */
     padding: 5px;
     margin-bottom: 10px;
     position: relative;
-    left: -100px; /* Move slightly to the left */
-    width: 200px; /* Give it a fixed width */
-    text-align: right; /* Align text to the right */
+    left: -220px; /* Move further to the left */
+    width: 200px; /* Keep the width the same */
+    text-align: right; /* Keep text aligned to the right */
 }
 
-/* Add some margin to the content to prevent overlap */
+/* Adjust the margin for the content to prevent overlap */
 .section-title + * {
-    margin-left: 110px; /* Slightly more than the 'left' value above */
+    margin-left: 20px; /* Reduce this to bring content closer to the left edge */
+}
+
+/* Ensure the parent container has enough padding to show the titles */
+.section-title:not(:first-child) {
+    padding-left: 220px; /* Should match the absolute value of 'left' above */
 }
