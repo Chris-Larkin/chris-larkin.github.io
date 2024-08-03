@@ -58,6 +58,8 @@ sections:
       filters:
         author: ""
         category: ""
+      design:
+        css_class: section-content-left
 
   - block: markdown
     id: contact
@@ -65,4 +67,6 @@ sections:
       title: <span class="sticky-title">Contact</span>
       subtitle: ''
       text: ''
+    design:
+      css_class: section-content-left
 ---
