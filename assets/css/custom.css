@@ -1,0 +1,8 @@
+.sticky-title {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+    background-color: white; /* Adjust as needed */
+    z-index: 1000; /* Ensure it stays above other content */
+    padding: 10px 0; /* Adjust as needed */
+}

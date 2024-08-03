@@ -40,3 +40,19 @@ window.addEventListener('load', function() {
   });
 
 // MOVE SECTION TITLES TO LEFT OF HOME SCREEN
+document.addEventListener('DOMContentLoaded', function () {
+  const sections = document.querySelectorAll('section');
+  const titles = document.querySelectorAll('.sticky-title');
+
+  window.addEventListener('scroll', function () {
+      sections.forEach((section, index) => {
+          const rect = section.getBoundingClientRect();
+          const title = titles[index];
+          if (rect.top <= 0 && rect.bottom >= 0) {
+              title.classList.add('visible');
+          } else {
+              title.classList.remove('visible');
+          }
+      });
+  });
+});

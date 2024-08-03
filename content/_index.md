@@ -34,7 +34,7 @@ sections:
   - block: collection
     id: papers
     content:
-      title: Projects
+      title: <span class="sticky-title">Projects</span>
       text:
       filters:
         folders:
@@ -47,7 +47,7 @@ sections:
   - block: collection
     id: news
     content:
-      title: Posts
+      title: <span class="sticky-title">Posts</span>
       subtitle: ''
       text: ''
       # Page type to display. E.g. post, talk, publication...
@@ -62,7 +62,7 @@ sections:
   - block: markdown
     id: contact
     content:
-      title: Contact
+      title: <span class="sticky-title">Contact</span>
       subtitle: ''
       text: ''
 ---
