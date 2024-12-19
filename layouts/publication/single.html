@@ -3,7 +3,7 @@
 {{ $pub_type_param := .Params.publication_types | default (slice 0) }}
 
 {{/* Convert string in form `"0"` to int (`0`) */}}
-{{ $pub_type := (int (index $pub_type_param 0)) | default 0 }}
+{{ $pub_type := (index $pub_type_param 0) | default 0 }}
 
 {{/* Validate Pub Type if defined */}}
 {{ if gt $pub_type (sub (len $pub_types) 1) }}

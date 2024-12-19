@@ -1,4 +1,3 @@
-{{- /* Generate the search index. */ -}}
 {{- $index := slice -}}
 {{- $pages := site.RegularPages -}}
 {{- /* Add the index page of multi-page content separately since it's not in RegularPages above. */ -}}
