@@ -3,11 +3,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:400,700&display=swap" rel="stylesheet">
 
-{{ $scss := resources.Get "scss/main.scss" 
-    | executeAsTemplate "scss/main.scss" . 
+{{ $scss := resources.Get "scss/main.scss"
+    | resources.ExecuteAsTemplate "scss/main.scss" . 
     | toCSS (dict "targetPath" "css/main.css") 
     | postCSS (dict "config" "postcss.config.js") 
     | minify }}
 
 <link rel="stylesheet" href="{{ $scss.RelPermalink }}">
 <link rel="stylesheet" href="{{ "css/custom.css" | relURL }}">
+
