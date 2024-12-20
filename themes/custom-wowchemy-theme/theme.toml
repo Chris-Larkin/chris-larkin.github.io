@@ -1,0 +1,6 @@
+name = "custom-wowchemy-theme"
+license = "MIT"
+licenseUrl = "https://opensource.org/licenses/MIT"
+description = "A custom Wowchemy theme for Hugo."
+author = "Your Name"
+homepage = "https://wowchemy.com/"
