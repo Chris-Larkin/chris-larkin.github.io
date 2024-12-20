@@ -23,8 +23,6 @@ module:
     min: '0.81.0'
     extended: true
   mounts:
-    - source: content
-      target: content
     - source: static
       target: static
     - source: layouts
