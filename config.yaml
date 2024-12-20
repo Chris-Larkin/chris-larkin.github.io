@@ -1,7 +1,7 @@
 title: "Chris Larkin"
 baseURL: "https://chris-larkin.github.io/"
 languageCode: "en-us"
-theme: "custom-wowchemy-theme"
+#theme: "custom-wowchemy-theme"
 
 menu:
   main:
