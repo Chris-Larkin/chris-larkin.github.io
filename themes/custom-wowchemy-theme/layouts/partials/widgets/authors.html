@@ -1,3 +1,5 @@
+{{ warnf "DEBUG: authors.html partial was called by page %s with author=%s" .page.File.Path (.author | default .page.Params.author) }}
+
 {{ $ := .root }}
 {{ $page := .page }}
 
