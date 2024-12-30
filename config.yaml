@@ -3,6 +3,19 @@ baseURL: "https://chris-larkin.github.io/"
 languageCode: "en-us"
 theme: "custom-wowchemy-theme"
 
+# Tells Hugo that the "home" route ("/") is a normal, published page
+# and not an auto-generated list. Helps Wowchemy treat content/home/_index.md
+# as the site homepage.
+home:
+  url: "/"
+  headless: false
+  draft: false
+
+# Optionally, disable taxonomy listing pages if you don’t need them.
+disableKinds:
+  - taxonomy
+  - term
+
 menu:
   main:
     - identifier: home
@@ -58,25 +71,8 @@ outputFormats:
     mediatype: text/netlify
     notAlternative: true
 
+# You renamed "authors" taxonomy to "contributors". That's fine.
 taxonomies:
-  author: "contributors"   # e.g. rename to "contributors" instead of "authors"
+  author: "contributors"
   category: "categories"
   tag: "tags"
-  
-# module:
-#   hugoVersion:
-#     min: '0.81.0'
-#     extended: true
-#   mounts:
-#     - source: static
-#       target: static
-#     - source: layouts
-#       target: layouts
-#     - source: data
-#       target: data
-#     - source: assets
-#       target: assets
-#     - source: i18n
-#       target: i18n
-#     - source: content
-#       target: content
