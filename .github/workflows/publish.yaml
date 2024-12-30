@@ -34,7 +34,7 @@ jobs:
         with:
           hugo-version: ${{ env.WC_HUGO_VERSION }}
           extended: true
-          # forceInstall: true  # (unofficial, may help if the old version is cached)
+          forceInstall: true  # (unofficial, may help if the old version is cached)
 
       - name: Check Hugo Version
         run: hugo version
