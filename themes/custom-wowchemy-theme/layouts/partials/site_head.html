@@ -28,7 +28,7 @@
   {{ $superuser_name := "" }}
   {{ $superuser_username := "" }}
   {{ $superuser_role := "" }}
-  {{ range first 1 (where (where site.Pages "Section" "authors") "Params.superuser" true) }}
+  {{ range first 1 (where (where site.Pages "Section" "profiles") "Params.superuser" true) }}
     {{ $superuser_name = .Title }}
     {{ $superuser_username = path.Base (path.Split .Path).Dir }}
     {{ $superuser_role = .Params.role }}

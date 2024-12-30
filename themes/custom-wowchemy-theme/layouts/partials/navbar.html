@@ -141,7 +141,7 @@
     <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
 
       {{/* Display any social links that the superuser chose to display in the header. */}}
-      {{ range where (where (where site.Pages "Section" "authors") ".Params.superuser" true) ".Params.social" "!=" nil }}
+      {{ range where (where (where site.Pages "Section" "profiles") ".Params.superuser" true) ".Params.social" "!=" nil }}
         {{ range where .Params.social ".display.header" true }}
           {{ $social_link := partial "functions/get_social_link" . }}
           <li class="nav-item d-none d-lg-inline-flex">
