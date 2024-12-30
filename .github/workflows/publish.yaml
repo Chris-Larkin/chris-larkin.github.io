@@ -1,7 +1,7 @@
 name: Deploy website to GitHub Pages
 
 env:
-  # 1) Pin the Hugo version to 0.139.4 for consistency
+  # Pin the exact Hugo version you want
   WC_HUGO_VERSION: '0.139.4'
 
 on:
@@ -20,23 +20,22 @@ concurrency:
 
 jobs:
   build:
-    if: github.repository_owner != 'HugoBlox'
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          # Fetch history for Hugo's .GitInfo and .Lastmod
           fetch-depth: 0
 
-      # 2) Setup Hugo Extended AFTER checkout, pinned to the same version used by GitHub Pages
+      # Force-install Hugo Extended
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: ${{ env.WC_HUGO_VERSION }}
           extended: true
+          # forceInstall: true  # (unofficial, may help if the old version is cached)
 
-      # OPTIONAL: Print the Hugo version to confirm extended is installed
       - name: Check Hugo Version
         run: hugo version
 
@@ -47,7 +46,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-hugomod-
 
-      # 3) Node setup (for PostCSS pipeline)
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -56,18 +54,16 @@ jobs:
       - name: Install PostCSS
         run: npm install postcss postcss-cli autoprefixer
 
-      # 4) Build Site with Hugo Extended
       - name: Build with Hugo
         env:
           HUGO_ENVIRONMENT: production
         run: |
+          echo "Hugo version (should show +extended):"
+          hugo version
           echo "Hugo Cache Dir: $(hugo config | grep cachedir)"
-          hugo --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
+          hugo --minify
 
-      - name: Generate Pagefind search index
-        run: npx pagefind --site "public"
-
-      # 5) Setup Pages AFTER the build
+      # Move the Pages config step after the site is built
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v3
@@ -78,13 +74,8 @@ jobs:
           path: ./public
 
   deploy:
-    if: github.repository_owner != 'HugoBlox'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
     needs: build
+    runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v2
