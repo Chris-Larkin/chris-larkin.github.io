@@ -58,6 +58,11 @@ outputFormats:
     mediatype: text/netlify
     notAlternative: true
 
+taxonomies:
+  author: "contributors"   # e.g. rename to "contributors" instead of "authors"
+  category: "categories"
+  tag: "tags"
+  
 # module:
 #   hugoVersion:
 #     min: '0.81.0'
