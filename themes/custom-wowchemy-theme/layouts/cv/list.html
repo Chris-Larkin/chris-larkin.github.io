@@ -1,3 +1,4 @@
-{{- define "main" -}}
-{{ partial "cv_layout.html" . }}
+{{ define "main" -}}
+  {{ .Scratch.Set "superuser_username" "admin" }}
+  {{ partial "cv_layout.html" . }}
 {{- end -}}

@@ -1,0 +1,8 @@
+themes/custom-wowchemy-theme/layouts/cv/single.html:{{ partial "cv_layout.html" . }}
+themes/custom-wowchemy-theme/layouts/cv/list.html:{{ partial "cv_layout.html" . }}
+themes/custom-wowchemy-theme/layouts/_default/baseof.html:    {{ if not (in (slice "book" "docs" "updates" "cv") .Type) }}
+themes/custom-wowchemy-theme/layouts/partials/cv_layout.html:      {{ partial "cv_author_bar" (dict "author_page" $author_page) }}
+themes/custom-wowchemy-theme/layouts/partials/widgets/about.html:      <a class="btn btn-outline-primary btn-page-header" href="/files/cv.pdf" target="_blank" rel="noopener">DOWNLOAD CV</a>
+themes/custom-wowchemy-theme/layouts/partials/widgets/authors.html:      <a class="btn btn-outline-primary btn-page-header" href="/files/cv.pdf" target="_blank" rel="noopener">DOWNLOAD CV</a>
+themes/custom-wowchemy-theme/layouts/partials/cv_author_bar.html:  <div class="media cv-author-bar avatar-widget">
+themes/custom-wowchemy-theme/layouts/partials/cv_author_bar.html:  <a class="btn btn-outline-primary btn-page-header pdf-button" href="/files/cv.pdf" target="_blank" rel="noopener">

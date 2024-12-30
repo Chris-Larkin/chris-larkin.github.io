@@ -1,0 +1,4151 @@
+====== themes/custom-wowchemy-theme/layouts/partials/page_links_div.html ======
+{{/* Div wrapper around page links. */}}
+{{/* The wrapper is hidden when the page has no link buttons. */}}
+
+{{ $has_attachments := partial "functions/has_attachments" . }}
+{{ if $has_attachments | or .Params.external_link }}
+<div class="btn-links mb-3">
+  {{ with .Params.external_link }}
+  <a class="btn btn-outline-primary my-1" href="{{ . }}" target="_blank" rel="noopener">{{ i18n "open_project_site" }}</a>
+  {{ end }}
+  {{ partial "page_links" (dict "page" . "is_list" 0) }}
+</div>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/cv_layout.html ======
+{{ $current_page := . }}
+
+
+{{/* Check whether to show breadcrumb navigation. */}}
+{{ $breadcrumb_page_types := site.Params.breadcrumb.page_types | default dict }}
+{{ $show_breadcrumb := index $breadcrumb_page_types .Type | default false }}
+
+<div class="container-fluid docs">
+  <div class="row flex-xl-nowrap">
+    <div class="d-none d-md-block d-xl-block col-12 col-md-3 col-xl-3 docs-sidebar">
+
+      {{ $author_page := site.GetPage (printf "/%s/%s" "authors" (.Scratch.Get "superuser_username")) }}
+      {{ partial "cv_author_bar" (dict "author_page" $author_page) }}
+
+    </div>
+
+    {{/* Show ToC by default. */}} 
+    {{ if false }}
+    <div class="d-none d-xl-block col-xl-2 docs-toc">
+      {{ partial "hooks/page_toc_start" . }}
+
+      <ul class="nav toc-top">
+        <li><a href="#" id="back_to_top" class="docs-toc-title">{{ i18n "on_this_page" }}</a></li>
+      </ul>
+
+      {{ .TableOfContents }}
+
+      {{ partial "hooks/page_toc_end" . }}
+    </div>
+    {{ end }}
+
+    <main class="col-12 col-md-9 col-xl-7 py-md-3 pl-md-5 docs-content" role="main">
+
+      <article class="article">
+
+        <div class="docs-article-container">
+          {{ if $show_breadcrumb }}
+            {{ partial "breadcrumb" $current_page }}
+          {{ end }}
+
+          <h1>{{ .Title }}</h1>
+
+          <p>{{ i18n "last_updated" }} {{ $.Lastmod.Format site.Params.date_format }}</p>
+
+          <div class="article-style">
+            {{ .Content }}
+          </div>
+        </div>
+
+      </article>
+
+
+      
+    </main>
+  </div>
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/navbar.html ======
+{{ $show_navbar := site.Params.main_menu.enable | default true }}
+{{ if $show_navbar }}
+
+{{ $current_page := . }}
+{{ $highlight_active_link := site.Params.main_menu.highlight_active_link | default true }}
+{{ $show_current_language := site.Params.main_menu.show_language | default false }}
+
+{{/* Get site logo. */}}
+{{ $show_logo := site.Params.main_menu.show_logo | default true }}
+{{ $has_logo := fileExists "assets/media/logo.png" | or (fileExists "assets/media/logo.svg") }}
+{{ $logo := "" }}
+{{ if $has_logo }}
+  {{ $logo = (partial "functions/get_logo" (dict "constraint" "max_height" "size" 70)) }}
+{{ end }}
+
+<nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+  <div class="container-xl">
+
+    {{if $show_logo}}
+    <div class="d-none d-lg-inline-flex">
+      <a class="navbar-brand" href="{{ "/" | relLangURL }}">
+        {{- if $has_logo -}}
+          <img src="{{ $logo.RelPermalink }}" alt="{{ site.Title }}">
+        {{- else -}}
+          {{- site.Title -}}
+        {{- end -}}
+      </a>
+    </div>
+    {{end}}
+
+    {{ if site.Menus.main }}
+    <button type="button" class="navbar-toggler" data-toggle="collapse"
+            data-target="#navbar-content" aria-controls="navbar-content" aria-expanded="false" aria-label="{{ i18n "toggle_navigation" }}">
+    <span><i class="fas fa-bars"></i></span>
+    </button>
+    {{ end }}
+
+    {{if $show_logo}}
+    <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+      <a class="navbar-brand" href="{{ "/" | relLangURL }}">
+      {{- if $has_logo -}}
+        <img src="{{ $logo.RelPermalink }}" alt="{{ site.Title }}">
+      {{- else -}}
+        {{- site.Title -}}
+      {{- end -}}
+      </a>
+    </div>
+    {{end}}
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    {{ $align_menu := site.Params.main_menu.align | default "l" }}
+    <div class="navbar-collapse main-menu-item collapse {{ if eq $align_menu "c" }}justify-content-center{{ else if eq $align_menu "r" }}justify-content-end{{else}}justify-content-start{{ end }}" id="navbar-content">
+
+      <!-- Left Nav Bar -->
+      <ul class="navbar-nav d-md-inline-flex">
+        {{ range site.Menus.main }}
+
+        {{ if .HasChildren }}
+        <li class="nav-item dropdown">
+          <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            {{- .Pre -}}<span>{{ .Name | safeHTML }}</span>{{- .Post -}}
+            <span class="caret"></span>
+          </a>
+          <div class="dropdown-menu">
+            {{ range .Children }}
+              <a class="dropdown-item" href="{{ .URL | relLangURL }}"{{ if $.IsHome }} data-target="{{ .URL }}"{{ end }}>
+                {{- .Pre -}}<span>{{ .Name | safeHTML }}</span>{{- .Post -}}
+              </a>
+            {{ end }}
+          </div>
+        </li>
+
+        {{ else }}
+
+        {{/* Set target for link. */}}
+        {{ $.Scratch.Set "target" "" }}
+        {{ if gt (len .URL) 4 }}
+          {{ if eq "http" (slicestr .URL 0 4) }}
+            {{ $.Scratch.Set "target" " target=\"_blank\" rel=\"noopener\"" }}
+          {{ end }}
+        {{ end }}
+
+        {{/* Get active page. */}}
+
+        {{ $is_link_in_current_path := false }}
+        {{ $is_widget_page := or $current_page.IsHome (eq $current_page.Type "widget_page") }}
+        {{ $is_same_page := false }}
+        {{ $hash := findRE "#(.+)" .URL }}
+
+        {{ if $current_page.IsHome | and (or (eq .URL "/") (eq .URL "")) }}
+          {{ $is_link_in_current_path = true }}
+        {{else}}
+          {{ if gt (len .URL) 1 }}{{/* Ignore root URL */}}
+            {{ $is_link_in_current_path = in $current_page.RelPermalink .URL }}
+            {{ $is_same_page = $is_link_in_current_path }}
+          {{end}}
+          {{ if gt (len $hash) 0 }}
+            {{ $hash = index $hash 0 }}
+            {{ $hash_removed := replace .URL $hash "" }}
+            {{ if eq (len $hash_removed) 0 }}
+              {{ $hash_removed = "/" }}{{/* Add robustness for `/#SECTION` or `#SECTION` in `menus.toml`. */}}
+            {{ end }}
+            {{ $is_same_page = eq (path.Dir $current_page.RelPermalink) (path.Dir ($hash_removed|relLangURL)) }}
+          {{ end }}
+        {{end}}
+
+        <li class="nav-item">
+          <a class="nav-link {{if and $highlight_active_link $is_link_in_current_path }} active{{end}}" href="{{.URL | relLangURL}}"{{ if and $is_widget_page $is_same_page }} data-target="{{$hash}}"{{ end }}{{ ($.Scratch.Get "target") | safeHTMLAttr }}>
+            {{- .Pre -}}<span>{{ .Name | safeHTML }}</span>{{- .Post -}}
+          </a>
+        </li>
+
+        {{ end }}
+        {{ end }}
+
+      {{ if site.Menus.main_right | and (eq $align_menu "l") }}
+      </ul>
+      <ul class="navbar-nav ml-md-auto">
+      {{ end }}
+
+        {{ range site.Menus.main_right }}
+
+        {{/* Set target for link. */}}
+        {{ $.Scratch.Set "target" "" }}
+        {{ if gt (len .URL) 4 }}
+        {{ if eq "http" (slicestr .URL 0 4) }}
+        {{ $.Scratch.Set "target" " target=\"_blank\" rel=\"noopener\"" }}
+        {{ end }}
+        {{ end }}
+
+        <li class="nav-item">
+          <a class="nav-link" href="{{ .URL | relLangURL }}"{{ if $.IsHome }} data-target="{{ .URL }}"{{ end }}{{ ($.Scratch.Get "target") | safeHTMLAttr }}>
+            {{- .Pre -}}<span>{{ .Name | safeHTML }}</span>{{- .Post -}}
+          </a>
+        </li>
+
+        {{ end }}
+      </ul>
+    </div><!-- /.navbar-collapse -->
+
+    <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+
+      {{/* Display any social links that the superuser chose to display in the header. */}}
+      {{ range where (where (where site.Pages "Section" "authors") ".Params.superuser" true) ".Params.social" "!=" nil }}
+        {{ range where .Params.social ".display.header" true }}
+          {{ $social_link := partial "functions/get_social_link" . }}
+          <li class="nav-item d-none d-lg-inline-flex">
+            <a class="nav-link" href="{{ $social_link.link | safeURL }}"{{ with $social_link.tooltip }} data-toggle="tooltip" data-placement="bottom" title="{{.}}"{{ end }} {{ $social_link.target | safeHTMLAttr }} aria-label="{{ $social_link.aria_label }}">
+              <i class="{{ $social_link.icon_pack }} {{ $social_link.pack_prefix }}-{{ $social_link.icon }}" aria-hidden="true"></i>
+            </a>
+          </li>
+        {{ end }}
+      {{ end }}
+
+      {{ $show_search := site.Params.main_menu.show_search | default true }}
+      {{ if and site.Params.search.provider $show_search }}
+      <li class="nav-item">
+        <a class="nav-link js-search" href="#" aria-label="{{ i18n "search" }}"><i class="fas fa-search" aria-hidden="true"></i></a>
+      </li>
+      {{ end }}
+
+      {{ $show_day_night := site.Params.main_menu.show_day_night | default true }}
+      {{ if and site.Params.day_night $show_day_night }}
+      <li class="nav-item dropdown theme-dropdown">
+        <a href="#" class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-label="{{ i18n "theme_selector" | default "Display preferences" }}">
+          <i class="fas fa-moon" aria-hidden="true"></i>
+        </a>
+        <div class="dropdown-menu">
+          <a href="#" class="dropdown-item js-set-theme-light">
+            <span>{{ i18n "theme_light" | default "Light" }}</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-dark">
+            <span>{{ i18n "theme_dark" | default "Dark" }}</span>
+          </a>
+          <a href="#" class="dropdown-item js-set-theme-auto">
+            <span>{{ i18n "theme_auto" | default "Automatic" }}</span>
+          </a>
+        </div>
+      </li>
+      {{ end }}
+
+      {{ $show_translations := site.Params.main_menu.show_translations | default true }}
+      {{ if .IsTranslated | and $show_translations }}
+      <li class="nav-item dropdown i18n-dropdown">
+        <a href="#" class="nav-link {{ if $show_current_language }}dropdown-toggle{{end}}" data-toggle="dropdown"
+           aria-haspopup="true" aria-label="{{ i18n "languages" | default "Languages" }}">
+          <i class="fas fa-globe mr-1" aria-hidden="true"></i>
+          {{- if $show_current_language -}}
+            <span class="d-none d-lg-inline">{{ index site.Data.i18n.languages .Lang }}</span>
+          {{- end -}}
+        </a>
+        <div class="dropdown-menu">
+          <div class="dropdown-item dropdown-item-active">
+            <span>{{ index site.Data.i18n.languages .Lang }}</span>
+          </div>
+          {{ range .Translations }}
+          <a class="dropdown-item" href="{{ .Permalink }}"{{ if $.IsHome }} data-target="{{ .RelPermalink }}"{{ end }}>
+            <span>{{ index site.Data.i18n.languages .Lang }}</span>
+          </a>
+          {{ end }}
+        </div>
+      </li>
+      {{ end }}
+
+    </ul>
+
+  </div><!-- /.container -->
+</nav>
+{{end}}{{/* End show navbar. */}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/section_pager.html ======
+{{ $str := "" }}
+<div class="post-nav">
+  {{if .NextInSection}}
+  {{/* For the Book layout, prev/next labels are reversed. */}}
+  {{ if in (slice "docs" "book") .Type }}{{ $str = "previous" }}{{else}}{{ $str = "next" }}{{end}}
+  <div class="post-nav-item">
+    <div class="meta-nav">{{ i18n $str }}</div>
+    <a href="{{.NextInSection.RelPermalink}}" rel="next">{{.NextInSection.Title}}</a>
+  </div>
+  {{end}}
+  {{if .PrevInSection}}
+  {{ if in (slice "docs" "book") .Type }}{{ $str = "next" }}{{else}}{{ $str = "previous" }}{{end}}
+  <div class="post-nav-item">
+    <div class="meta-nav">{{ i18n $str }}</div>
+    <a href="{{.PrevInSection.RelPermalink}}" rel="prev">{{.PrevInSection.Title}}</a>
+  </div>
+  {{end}}
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/cookie_consent.html ======
+{{ if site.Params.privacy_pack }}
+  {{ $scr := .Scratch }}
+  {{ $js := site.Data.assets.js }}
+  {{ $css := site.Data.assets.css }}
+  {{ if ($scr.Get "use_cdn") }}
+    {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.cookieconsent.url $js.cookieconsent.version) $js.cookieconsent.sri | safeHTML }}
+    {{ printf "<link rel=\"stylesheet\" href=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\">" (printf $css.cookieconsent.url $css.cookieconsent.version) $css.cookieconsent.sri | safeHTML }}
+  {{ end }}
+  <script>
+  window.addEventListener("load", function(){
+    window.cookieconsent.initialise({
+      "palette": {
+        "popup": {
+          "background": "{{ $scr.Get "primary" }}",
+          "text": "{{ $scr.Get "background" }}"
+        },
+        "button": {
+          "background": "{{ $scr.Get "background" }}",
+          "text": "{{ $scr.Get "primary" }}"
+        }
+      },
+      "theme": "classic",
+      "content": {
+        "message": {{ i18n "cookie_message" | default "This website uses cookies to ensure you get the best experience on our website." }},
+        "dismiss": {{ i18n "cookie_dismiss" | default "Got it!" }},
+        "link": {{ i18n "cookie_learn" | default "Learn more" }},
+        "href": {{ with site.GetPage "privacy.md" }}{{ printf "%s" .RelPermalink }}{{ else }}"https://www.cookiesandyou.com"{{ end }}
+      }
+    })});
+  </script>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/site_js.html ======
+    {{ $scr := $.Scratch }}
+
+    {{/* Attempt to load local vendor JS, otherwise load from CDN. */}}
+    {{ $js := site.Data.assets.js }}
+    {{ if not ($scr.Get "use_cdn") }}
+      <script src="{{ printf "/js/vendor/%s" ($scr.Get "vendor_js_filename") | relURL }}"></script>
+    {{ else }}
+      {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.jQuery.url $js.jQuery.version) $js.jQuery.sri | safeHTML }}
+      {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.instantpage.url $js.instantpage.version) $js.instantpage.sri | safeHTML }}
+
+      {{ $require_isotope := site.Params.require_isotope | default true }}
+      {{ if $require_isotope }}
+        {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.imagesLoaded.url $js.imagesLoaded.version) $js.imagesLoaded.sri | safeHTML }}
+        {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.isotope.url $js.isotope.version) $js.isotope.sri | safeHTML }}
+      {{ end }}
+
+      {{/* Workaround `.HasShortcode "gallery"` detection issue on `home/` WidgetPage v1 */}}
+      {{ if .HasShortcode "gallery" | or (and .IsHome (site.Params.require_fancybox | default true)) }}
+        {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.fancybox.url $js.fancybox.version) $js.fancybox.sri | safeHTML }}
+      {{ end }}
+
+      {{ if or .Params.diagram site.Params.diagram }}
+        {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\" title=\"mermaid\"></script>" (printf $js.mermaid.url $js.mermaid.version) $js.mermaid.sri | safeHTML }}
+      {{ end }}
+
+      {{ if $.Scratch.Get "highlight_enabled" }}
+        {{ $v := $js.highlight.version }}
+        {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.highlight.url $v) $js.highlight.sri | safeHTML }}
+        {{ range site.Params.highlight_languages }}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/{{ $v }}/languages/{{ . }}.min.js"></script>
+        {{ end }}
+      {{ end }}
+
+    {{ end }}
+
+    {{/* Maps JS. */}}
+    {{ $map_provider := lower site.Params.map.provider }}
+    {{ if eq $map_provider "google" }}
+      <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ site.Params.map.api_key }}"></script>
+      {{ if ($scr.Get "use_cdn") }}
+        {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.gmaps.url $js.gmaps.version) $js.gmaps.sri | safeHTML }}
+      {{ end }}
+    {{ else if (in (slice "mapnik" "mapbox") $map_provider) | and ($scr.Get "use_cdn") }}
+      {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.leaflet.url $js.leaflet.version) $js.leaflet.sri | safeHTML }}
+    {{ end }}
+
+    {{/* Load hash anchors for documentation pages. */}}
+    {{ if in (slice "book" "docs") .Type }}
+    {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.anchor.url $js.anchor.version) $js.anchor.sri | safeHTML }}
+    <script>
+      anchors.add();
+    </script>
+    {{ end }}
+
+    {{ $algoliaConfig := dict }}
+    {{ $search_provider := lower site.Params.search.provider }}
+    {{ if eq $search_provider "wowchemy" }}
+      {{/* Wowchemy built-in search result template (Fuse). */}}
+      <script id="search-hit-fuse-template" type="text/x-template">
+        <div class="search-hit" id="summary-{{"{{key}}"}}">
+          <div class="search-hit-content">
+            <div class="search-hit-name">
+              {{ printf "<a href=\"%s\">%s</a>" "{{relpermalink}}" "{{title}}" | safeHTML }}
+              <div class="article-metadata search-hit-type">{{"{{type}}"}}</div>
+              <p class="search-hit-description">{{"{{snippet}}"}}</p>
+            </div>
+          </div>
+        </div>
+      </script>
+      {{ if ($scr.Get "use_cdn") }}
+        {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.fuse.url $js.fuse.version) $js.fuse.sri | safeHTML }}
+        {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.mark.url $js.mark.version) $js.mark.sri | safeHTML }}
+      {{ end }}
+    {{ else if eq $search_provider "algolia" }}
+      {{/* Algolia search result template. */}}
+      <script id="search-hit-algolia-template" type="text/html">
+        <div class="search-hit">
+          <div class="search-hit-content">
+            <div class="search-hit-name">
+              {{ printf "<a href=\"%s\">{{{_highlightResult.title.value}}}</a>" "{{relpermalink}}" | safeHTML }}
+            </div>
+            <div class="article-metadata search-hit-type">{{"{{type}}"}}</div>
+            <p class="search-hit-description">{{ safeHTML "{{{_highlightResult.summary.value}}}" }}</p>
+          </div>
+        </div>
+      </script>
+      {{ if ($scr.Get "use_cdn") }}
+        {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.instantsearch.url $js.instantsearch.version) $js.instantsearch.sri | safeHTML }}
+      {{ end }}
+      {{ $algoliaConfig = dict "appId" (site.Params.search.algolia.app_id | default "") "apiKey" (site.Params.search.algolia.api_key | default "") "indexName" (site.Params.search.algolia.index_name | default "") "poweredBy" (site.Params.search.algolia.show_logo | default false) }}
+    {{ end }}
+
+    {{/* Charts */}}
+    {{ if .HasShortcode "chart" }}
+      {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\"></script>" (printf $js.plotly.url $js.plotly.version) $js.plotly.sri | safeHTML }}
+    {{ end }}
+
+    {{/* Disqus Comment Count JS. */}}
+    {{/* Note: count can appear both in listing previews and on the content page itself. */}}
+    {{ $comments_provider := trim (site.Params.comments.provider | lower) " " }}
+    {{ if eq $comments_provider "disqus" | and (site.Params.comments.disqus.show_count | default true) }}
+      <script id="dsq-count-scr" src="https://{{site.Params.comments.disqus.shortname}}.disqus.com/count.js" async></script>
+    {{end}}
+
+    {{/* Rename as GitHub Pages doesn't automatically publish folders with underscores. */}}
+    {{ $js_bootstrap := slice (resources.Get "js/_vendor/bootstrap.bundle.min.js") | resources.Concat "js/bootstrap.bundle.min.js" }}
+    {{- if hugo.IsProduction -}}
+      {{ $js_bootstrap = $js_bootstrap | fingerprint "md5" }}{{/* Note: no `minify` as using pre-minified JS. */}}
+    {{- end -}}
+    <script src="{{ $js_bootstrap.RelPermalink }}"></script>
+
+    {{ $js_search_params := dict }}
+    {{ if in (slice "wowchemy" "algolia") $search_provider }}
+      {{/* Configure search engine. */}}
+      {{ $min_length := site.Params.search.wowchemy.min_length | default 1 }}
+      {{ $threshold := site.Params.search.wowchemy.threshold | default 0.3 }}
+      {{ $search_config := dict "indexURI" ("/index.json" | relLangURL) "threshold" $threshold "minLength" $min_length }}
+      {{ $search_i18n := dict "placeholder" (i18n "search_placeholder") "results" (i18n "search_results") "no_results" (i18n "search_no_results") }}
+      {{ $content_types := dict "post" (i18n "posts") "project" (i18n "projects") "publication" (i18n "publications") "event" (i18n "talks") "slides" (i18n "slides") "authors" (i18n "authors") }}
+      {{ $js_search_params = dict "search_config" $search_config "algoliaConfig" $algoliaConfig "i18n" $search_i18n "content_type" $content_types }}
+    {{ end }}
+
+    {{ $js_license := printf "/*! Wowchemy v%s | https://wowchemy.com/ */\n" site.Data.wowchemy.version }}
+    {{ $js_license := $js_license | printf "%s/*! Copyright 2016-present George Cushen (https://georgecushen.com/) */\n" }}
+    {{ $js_license := $js_license | printf "%s/*! License: https://github.com/wowchemy/wowchemy-hugo-modules/blob/main/LICENSE.md */\n" }}
+    {{ $js_bundle_head := $js_license | resources.FromString "js/bundle-head.js" }}
+    {{ $js_params := dict "hugoEnvironment" hugo.Environment "codeHighlighting" ($scr.Get "highlight_enabled" | default false) "searchEnabled" (in (slice "wowchemy" "algolia") $search_provider) }}
+    {{ $js_academic := resources.Get "js/wowchemy.js" | js.Build (dict "targetPath" (printf "%s/js/wow-core.js" .Lang ) "params" $js_params) }}
+    {{ $js_bundle := slice $js_academic }}
+    {{ if eq $search_provider "wowchemy" }}
+      {{ $js_academic_search := resources.Get "js/wowchemy-search.js" | js.Build (dict "targetPath" (printf "%s/js/wow-search-built.js" .Lang) "params" $js_search_params) }}
+      {{ $js_bundle = $js_bundle | append $js_academic_search }}
+    {{ else if eq $search_provider "algolia" }}
+      {{ $js_algolia_search := resources.Get "js/algolia-search.js" | js.Build (dict "targetPath" (printf "%s/js/algolia-search-built.js" .Lang) "params" $js_search_params) }}
+      {{ $js_bundle = $js_bundle | append $js_algolia_search }}
+    {{ end }}
+    {{ range site.Params.plugins_js }}
+      {{ $js_bundle = $js_bundle | append (resources.Get (printf "js/%s.js" .)) }}
+    {{ end }}
+    {{ $js_bundle := $js_bundle | resources.Concat (printf "%s/js/wowchemy-bundle.js" .Lang) }}
+    {{- if hugo.IsProduction -}}
+      {{ $js_bundle = $js_bundle | minify }}
+    {{- end -}}
+    {{ $js_bundle := slice $js_bundle_head $js_bundle | resources.Concat (printf "%s/js/wowchemy.min.js" .Lang) }}
+    {{- if hugo.IsProduction -}}
+      {{- $js_bundle = $js_bundle | js.Build (dict "format" "iife") | fingerprint "md5" -}}
+    {{- else -}}
+      {{- $js_bundle = $js_bundle | js.Build (dict "format" "iife" "sourceMap" "inline") -}}
+    {{- end -}}
+    <script src="{{ $js_bundle.RelPermalink }}"></script>
+
+    {{ partial "custom_js" . }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/page_metadata.html ======
+{{ $is_list := .is_list }}
+{{ $page := .page }}
+
+<div class="article-metadata">
+
+  {{/* If `authors` is set and is not empty. */}}
+  {{ if $page.Params.authors }}
+  {{ $authorLen := len $page.Params.authors }}
+  {{ if gt $authorLen 0 }}
+  <div>
+    {{ partial "page_metadata_authors" $page }}
+  </div>
+  {{ end }}
+  {{ end }}
+
+  {{ if not (in (slice "event" "page") $page.Type) }}
+  <span class="article-date">
+    {{ $date := $page.Lastmod.Format site.Params.date_format }}
+    {{ if eq $page.Type "publication" }}
+      {{ $date = $page.Date.Format (site.Params.publications.date_format | default "January, 2006") }}
+    {{ else }}
+      {{ if ne $page.Params.Lastmod $page.Params.Date }}
+          {{ i18n "last_updated" }}
+      {{ end }}
+    {{ end }}
+    {{ $date }}
+  </span>
+  {{ end }}
+
+  {{ if and (eq $is_list 1) (eq $page.Type "publication") }}
+  <span class="middot-divider"></span>
+  <span class="pub-publication">
+    {{ if $page.Params.publication_short }}
+      {{ $page.Params.publication_short | markdownify }}
+    {{ else if $page.Params.publication }}
+      {{ $page.Params.publication | markdownify }}
+    {{ end }}
+  </span>
+  {{ end }}
+
+  {{ if and (eq $page.Type "post") (not (or (eq site.Params.reading_time false) (eq $page.Params.reading_time false))) }}
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    {{ $page.ReadingTime }} {{ i18n "minute_read" }}
+  </span>
+  {{ end }}
+
+  {{/* Show Disqus comment count if enabled. */}}
+  {{ $comments_provider := trim (site.Params.comments.provider | lower) " " }}
+  {{ $commentable_page_types := site.Params.comments.commentable | default dict }}
+  {{ $commentable_page_type := index $commentable_page_types $page.Type | default false }}
+  {{ $commentable_page := (ne $page.Params.commentable false) | and $commentable_page_type }}
+  {{ if (eq $comments_provider "disqus") | and (site.Params.comments.disqus.show_count | default true) | and $commentable_page }}
+    <span class="middot-divider"></span>
+    <a href="{{ $page.RelPermalink }}#disqus_thread"><!-- Count will be inserted here --></a>
+  {{ end}}
+
+  {{ $taxonomy := "categories" }}
+  {{ if $page.Param $taxonomy }}
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i>
+    {{- range $index, $value := ($page.GetTerms $taxonomy) -}}
+      {{- if gt $index 0 }}, {{ end -}}
+      <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+    {{- end -}}
+  </span>
+  {{ end }}
+
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/custom_js.html ======
+{{/* Do not directly modify this file! */}}
+{{/* Instead, create a `layouts/partials/custom_js.html` file in your site and add your code to it. */}}
+
+{{/* This partial is included in `themes/academic/layouts/partials/site_js.html`. */}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/citation.html ======
+<!-- Citation modal -->
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ i18n "btn_cite" }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> {{ i18n "btn_copy" }}
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> {{ i18n "btn_download" }}
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+====== themes/custom-wowchemy-theme/layouts/partials/portfolio_li_list.html ======
+{{ $item := .item }}
+{{ $js_tag_classes := delimit (apply (apply $item.Params.tags "replace" "." " " "-") "printf" "js-id-%s" ".") " " }}
+
+<div class="col-12 isotope-item {{ $js_tag_classes | safeHTMLAttr }}">
+  {{ partial "li_list" $item }}
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/book_menu.html ======
+{{ define "book-menu" }}
+
+{{- $first := false -}}
+{{- $current_node := .current_node -}}
+{{- $is_root := .is_root -}}
+{{- $order_by := .order_by -}}
+{{ $icon := "" }}
+
+{{ with .sect }}
+  {{ if .IsSection }}
+    {{ if not $is_root }}
+      {{- $first = (eq $current_node.FirstSection.Type "book") | and (eq $current_node.FirstSection .) -}}
+    {{ end }}
+
+    {{- safeHTML $current_node.FirstSection.Params.pre_nav -}}
+
+    {{/* Get section icon. */}}
+    {{ $pack := or .Params.icon_pack "fas" }}
+    {{ $pack_prefix := $pack }}
+    {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+      {{ $pack_prefix = "fa" }}
+    {{ end }}
+    {{ with .Params.icon }}
+      {{- if eq $pack "emoji" -}}
+        {{- . | emojify -}}
+      {{- else if eq $pack "custom" -}}
+        {{- $svg_icon := resources.Get (printf "media/icons/%s.svg" .) -}}
+        {{- if $svg_icon -}}
+          {{ $icon = printf "<img src=\"%s\" alt=\"%s\" class=\"svg-icon svg-baseline pr-1\">" $svg_icon.RelPermalink . }}
+        {{- end -}}
+      {{- else -}}
+        {{ $icon = printf "<i class=\"%s %s-%s pr-1\"></i>" $pack $pack_prefix . }}
+      {{- end -}}
+    {{ end }}
+
+    {{ if $first }}
+    <ul class="nav docs-sidenav">
+      <li class="{{ if and .File $current_node.File | and (eq .File.Path $current_node.File.Path) }}active{{ end }}"><a href="{{ .RelPermalink }}">{{ safeHTML $icon }}{{ .LinkTitle | default .Title }}</a></li>
+  {{else}}
+    <div class="docs-toc-item">
+      <a class="docs-toc-link {{ if and .File $current_node.File | and (eq .File.Path $current_node.File.Path) }} active{{ end }}" href="{{ .RelPermalink }}">{{ safeHTML $icon }}{{ .LinkTitle | default .Title }}</a>
+  {{end}}
+
+    {{- $page_count := (add (len .Pages) (len .Sections)) -}}
+    {{ if ne $page_count 0 }}
+      {{ if not $first }}
+        <ul class="nav docs-sidenav">
+      {{end}}
+      {{- .Scratch.Set "pages" .Pages -}}
+      {{- if .Sections -}}
+        {{- .Scratch.Set "pages" (.Pages | union .Sections) -}}
+      {{- end -}}
+      {{- $pages := (.Scratch.Get "pages") -}}
+      {{- if eq $order_by "title" -}}
+        {{- range $pages.ByTitle -}}
+          {{ template "book-menu" dict "sect" . "current_node" $current_node "order_by" $order_by }}
+        {{- end -}}
+      {{- else if eq $order_by "title_desc" -}}
+        {{- range $pages.ByTitle.Reverse -}}
+          {{ template "book-menu" dict "sect" . "current_node" $current_node "order_by" $order_by }}
+        {{- end -}}
+      {{- else -}}
+        {{- range $pages.ByWeight -}}
+          {{ template "book-menu" dict "sect" . "current_node" $current_node "order_by" $order_by }}
+        {{- end -}}
+      {{- end}}
+      {{ if not $first }}
+        </ul>
+      {{end}}
+    {{end}}
+
+    {{ if not $first }}
+      </div>
+    {{else}}
+      </ul>
+    {{end}}
+
+  {{- else -}}
+    {{- if not .Params.Hidden -}}
+    <li class="{{ if and .File $current_node.File | and (eq .File.Path $current_node.File.Path) }}active{{ end }}"><a href="{{ .RelPermalink }}">{{ safeHTML $icon }}{{ .LinkTitle | default .Title }}</a></li>
+    {{- end -}}
+  {{ end -}}
+{{- end -}}
+
+{{/* End define. */}}
+{{ end -}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/page_links.html ======
+{{ $is_list := .is_list }}
+{{ $page := .page }}
+{{ $link := "" }}
+
+{{/* ***** TODO: Deprecate `url_preprint` in favour of `url_pdf` given there's now a dedicated "Preprint" pub. type. ***** */}}
+{{ with $page.Params.url_preprint }}
+  {{ $resource := $page.Resources.GetMatch . }}
+  {{ if $resource }}
+    {{ $link = $resource.RelPermalink }}
+  {{ else }}
+    {{ $link = . | relURL }}
+  {{ end }}
+<a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ $link }}" target="_blank" rel="noopener">
+  {{ i18n "btn_preprint" }}
+</a>
+{{ end }}
+{{ $pdf := "" }}
+{{ $resource := $page.Resources.GetMatch (printf "%s.pdf" $page.File.ContentBaseName) }}
+{{ with $resource }}
+  {{ $pdf = .RelPermalink }}
+{{ else }}
+  {{ if $page.Params.url_pdf }}
+    {{ $pdf = $page.Params.url_pdf | relURL }}
+  {{ end }}
+{{ end }}
+
+{{ with $pdf }}
+<a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ . }}" target="_blank" rel="noopener">
+  {{ i18n "btn_pdf" }}
+</a>
+{{ end }}
+{{ $resource := $page.Resources.GetMatch "cite.bib" }}
+{{ with $resource }}
+<a href="#" class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}} js-cite-modal"
+        data-filename="{{ .RelPermalink }}">
+  {{ i18n "btn_cite" }}
+</a>
+{{ end }}
+{{ with $page.Params.url_code }}
+  {{ $resource := $page.Resources.GetMatch . }}
+  {{ if $resource }}
+    {{ $link = $resource.RelPermalink }}
+  {{ else }}
+    {{ $link = . | relURL }}
+  {{ end }}
+<a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ $link }}" target="_blank" rel="noopener">
+  {{ i18n "btn_code" }}
+</a>
+{{ end }}
+{{ with $page.Params.url_dataset }}
+  {{ $resource := $page.Resources.GetMatch . }}
+  {{ if $resource }}
+    {{ $link = $resource.RelPermalink }}
+  {{ else }}
+    {{ $link = . | relURL }}
+  {{ end }}
+<a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ $link }}" target="_blank" rel="noopener">
+  {{ i18n "btn_dataset" }}
+</a>
+{{ end }}
+{{ if $page.Params.projects }}
+{{ range $page.Params.projects }}
+  {{ with (site.GetPage (printf "project/%s" .)) }}
+  <a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ .RelPermalink }}">
+    {{ i18n "btn_project" }}
+  </a>
+  {{ else }}
+    {{/* errorf "The `projects` parameter in `content/%s` references a project file, `content/project/%s`, which cannot be found. Please either set `projects = []` or fix the reference." $page.File.Path . */}}
+  {{ end }}
+{{ end }}
+{{ else }}
+{{ with $page.Params.url_project }}
+<a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ . }}" target="_blank" rel="noopener">
+  {{ i18n "btn_project" }}
+</a>
+{{ end }}
+{{ end }}
+{{ with $page.Params.url_poster }}
+  {{ $resource := $page.Resources.GetMatch . }}
+  {{ if $resource }}
+    {{ $link = $resource.RelPermalink }}
+  {{ else }}
+    {{ $link = . | relURL }}
+  {{ end }}
+<a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ $link }}" target="_blank" rel="noopener">
+  {{ i18n "btn_poster" }}
+</a>
+{{ end }}
+{{ if $page.Params.slides }}
+  {{ with (site.GetPage (printf "slides/%s" $page.Params.slides)) }}
+  <a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ .RelPermalink }}" target="_blank">
+    {{ i18n "btn_slides" }}
+  </a>
+  {{ end }}
+{{ else }}
+{{ with $page.Params.url_slides }}
+  {{ $resource := $page.Resources.GetMatch . }}
+  {{ if $resource }}
+    {{ $link = $resource.RelPermalink }}
+  {{ else }}
+    {{ $link = . | relURL }}
+  {{ end }}
+<a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ $link }}" target="_blank" rel="noopener">
+  {{ i18n "btn_slides" }}
+</a>
+{{ end }}
+{{ end }}
+{{ with $page.Params.url_video }}
+  {{ $resource := $page.Resources.GetMatch . }}
+  {{ if $resource }}
+    {{ $link = $resource.RelPermalink }}
+  {{ else }}
+    {{ $link = . | relURL }}
+  {{ end }}
+<a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ $link }}" target="_blank" rel="noopener">
+  {{ i18n "btn_video" }}
+</a>
+{{ end }}
+{{ with $page.Params.url_source }}
+  {{ $resource := $page.Resources.GetMatch . }}
+  {{ if $resource }}
+    {{ $link = $resource.RelPermalink }}
+  {{ else }}
+    {{ $link = . | relURL }}
+  {{ end }}
+<a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ $link }}" target="_blank" rel="noopener">
+  {{ i18n "btn_source" }}
+</a>
+{{ end }}
+{{ with $page.Params.doi }}
+<a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="https://doi.org/{{ . }}" target="_blank" rel="noopener">
+  DOI
+</a>
+{{ end }}
+{{ range $page.Params.links }}
+  {{ $pack := or .icon_pack "fas" }}
+  {{ $pack_prefix := $pack }}
+  {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+    {{ $pack_prefix = "fa" }}
+  {{ end }}
+  {{ $link := .url | default "" }}
+  {{ $scheme := (urls.Parse $link).Scheme }}
+  {{ $target := "" }}
+  {{ if not $scheme }}
+    {{ $resource := $page.Resources.GetMatch $link }}
+    {{ if $resource }}
+      {{ $link = $resource.RelPermalink }}
+    {{ else }}
+      {{ $link = $link | relURL }}
+    {{ end }}
+  {{ else if in (slice "http" "https") $scheme }}
+    {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+  {{ end }}
+  <a class="btn btn-outline-primary btn-page-header{{ if $is_list }} btn-sm{{end}}" href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }}>
+    {{ if .icon }}<i class="{{ $pack }} {{ $pack_prefix }}-{{ .icon }} {{if .name}}mr-1{{end}}"></i>{{end}}
+    {{ with .name }}{{ . | safeHTML }}{{end}}
+  </a>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/book_layout.html ======
+{{ $current_page := . }}
+
+<div class="container-fluid docs">
+  <div class="row flex-xl-nowrap">
+    <div class="col-12 col-md-3 col-xl-2 docs-sidebar">
+      {{ partial "book_sidebar" . }}
+    </div>
+
+    {{/* Show ToC by default. */}}
+    {{ if ne .Params.toc false }}
+    <div class="d-none d-xl-block col-xl-2 docs-toc">
+      {{ partial "hooks/page_toc_start" . }}
+
+      <ul class="nav toc-top">
+        <li><a href="#" id="back_to_top" class="docs-toc-title">{{ i18n "on_this_page" }}</a></li>
+      </ul>
+
+      {{ .TableOfContents }}
+
+      {{ partial "hooks/page_toc_end" . }}
+    </div>
+    {{ end }}
+
+    <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 docs-content" role="main">
+
+      <article class="article">
+
+        <div class="docs-article-container">
+
+          <h1>{{ .Title }}</h1>
+
+          <p>{{ i18n "last_updated" }} {{ $.Lastmod.Format site.Params.date_format }}</p>
+
+          <div class="article-style">
+            {{ .Content }}
+          </div>
+
+          {{ partial "tags.html" . }}
+
+          {{/* Show next/previous pages by default. */}}
+          {{ if ne site.Params.book_section_pager false }}
+          <div class="article-widget">
+            {{ partial "section_pager" . }}
+          </div>
+          {{ end }}
+        </div>
+
+        <div class="body-footer">
+
+          {{ partial "page_edit" . }}
+
+          {{ partial "comments" . }}
+
+          {{ partial "page_related" . }}
+        </div>
+
+      </article>
+
+      {{ partial "site_footer" . }}
+
+    </main>
+  </div>
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/page_metadata_authors.html ======
+{{/* Display author list. */}}
+
+{{- $taxonomy := "authors" }}
+{{ if .Param $taxonomy }}
+  {{ range $index, $value := (.GetTerms $taxonomy) }}
+    {{- /* Highlight the author's name? */ -}}
+    {{- $highlight_name := .Page.Params.highlight_name | default false -}}
+
+    {{- if gt $index 0 }}, {{ end -}}
+    <span {{ if $highlight_name }}class="author-highlighted"{{end}}>
+      {{/* Effectively check the page's `_build` option as `_build` is not exposed in Hugo's Page object. */}}
+      {{- if .RelPermalink -}}
+        <a href="{{.RelPermalink}}">{{.LinkTitle}}</a>
+      {{- else -}}
+        {{ .LinkTitle }}
+      {{- end -}}
+    </span>
+    {{- if isset $.Params "author_notes" -}}
+      {{- with (index $.Params.author_notes $index) -}}
+        <i class="author-notes fas fa-info-circle" data-toggle="tooltip" title="{{.}}"></i>
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/page_edit.html ======
+{{/* This makes `edit_page` optional in `params.toml` and prevents errors if it's removed. */}}
+{{ if site.Params.edit_page }}
+{{ if site.Params.edit_page.repo_url | and (index site.Params.edit_page.editable .Type) | and (ne .Params.editable false) | or .Params.editable }}
+{{/* Get language subfolder for multilingual sites. */}}
+{{/* Limitations: the subfolder param, `<LANG>.contentDir`, is unexposed in the Hugo `site` API so we attempt to workaround this issue. */}}
+{{ $content_dir := "content" }}
+{{ if site.Params.edit_page.content_dir }}
+  {{ $content_dir = site.Params.edit_page.content_dir }}
+{{else}}
+  {{/* Attempt to get content dir from the LanguagePrefix URI, but defaultContentLanguageInSubdir can break this assumption. */}}
+  {{ $content_dir = cond site.IsMultiLingual (cond (ne .Site.LanguagePrefix "") (printf "%s%s" $content_dir .Site.LanguagePrefix) $content_dir) $content_dir }}
+{{end}}
+<p class="edit-page">
+  <a href="{{site.Params.edit_page.repo_url}}/edit/{{site.Params.edit_page.repo_branch | default "main"}}/{{$content_dir}}/{{.File.Path}}">
+    <i class="fas fa-pen pr-2"></i>{{ i18n "edit_page" | default "Edit this page" }}
+  </a>
+</p>
+{{ end }}
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/social_links.html ======
+<ul class="network-icon" aria-hidden="true">
+  {{ range .Params.social }}
+    {{ $pack := or .icon_pack "fas" }}
+    {{ $pack_prefix := $pack }}
+    {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+      {{ $pack_prefix = "fa" }}
+    {{ end }}
+    {{ $link := .link }}
+    {{ $scheme := (urls.Parse $link).Scheme }}
+    {{ $target := "" }}
+    {{ if not $scheme }}
+      {{ $link = .link | relLangURL }}
+    {{ else if in (slice "http" "https") $scheme }}
+      {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+    {{ end }}
+    <li>
+      <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }}>
+        <i class="{{ $pack }} {{ $pack_prefix }}-{{ .icon }}"></i>
+      </a>
+    </li>
+  {{end}}
+</ul>
+
+====== themes/custom-wowchemy-theme/layouts/partials/share.html ======
+{{ if and site.Params.sharing (ne .Params.share false) }}
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    {{ range where site.Data.page_sharer.buttons "enable" true }}
+      {{ $pack := or .icon_pack "fas" }}
+      {{ $pack_prefix := $pack }}
+      {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+        {{ $pack_prefix = "fa" }}
+      {{ end }}
+      {{ $link := replace .url "{url}" ($.Permalink | htmlEscape) }}
+      {{ $link = replace $link "{title}" ($.Title | htmlEscape) }}
+      <li>
+        <a href="{{$link|safeURL}}" target="_blank" rel="noopener" class="share-btn-{{.id}}">
+          <i class="{{$pack}} {{$pack_prefix}}-{{.icon}}"></i>
+        </a>
+      </li>
+    {{ end }}
+  </ul>
+</div>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/tags.html ======
+{{ $taxonomy := "tags" }}
+{{ if .Param $taxonomy }}
+<div class="article-tags">
+  {{ range $index, $value := (.GetTerms $taxonomy) }}
+  <a class="badge badge-light" href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+  {{ end }}
+</div>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/page_related.html ======
+{{/* This makes `show_related` optional in `params.toml` and prevents errors if it's removed. */}}
+{{ if site.Params.show_related }}
+{{ if (index site.Params.show_related .Type) | and (ne .Params.show_related false) | or .Params.show_related }}
+  {{ $related := site.RegularPages.Related . | first 5 }}
+  {{ with $related }}
+  <div class="article-widget content-widget-hr">
+    <h3>{{ i18n "related" }}</h3>
+    <ul>
+      {{ range . }}
+      <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+      {{ end }}
+    </ul>
+  </div>
+  {{ end }}
+{{ end }}
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/li_list.html ======
+{{ $item := . }}
+
+{{/* Dynamic view adjusts to content type. */}}
+{{ $icon_pack := "far" }}
+{{ $icon := "fa-file-alt" }}
+{{ $show_authors := false }}
+{{ $link := $item.RelPermalink }}
+{{ $target := "" }}
+{{ if $item.Params.external_link }}
+  {{ $link = $item.Params.external_link }}
+  {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+{{ end }}
+{{ if eq $item.Type "post" }}
+  {{ $icon = "fa-newspaper" }}
+{{ else if eq $item.Type "event" }}
+  {{ $icon = "fa-calendar-alt" }}
+{{ else if eq $item.Type "publication" }}
+  {{ $show_authors = true }}
+{{ else if eq $item.Type "project" }}
+  {{ $icon_pack = "fas" }}
+  {{ $icon = "fa-project-diagram" }}
+  {{ $show_authors = true }}
+{{ end }}
+
+{{ $has_attachments := partial "functions/has_attachments" . }}
+
+<div class="view-list-item">
+  <i class="{{$icon_pack}} {{$icon}} pub-icon" aria-hidden="true"></i>
+  <a href="{{$link}}" {{ $target | safeHTMLAttr }}>{{ $item.Title }}</a>
+
+  {{ if eq $item.Type "event" }}
+  <div class="article-metadata">
+    <span>
+      {{ partial "functions/get_event_dates" $item }}
+    </span>
+    {{ with $item.Params.location }}
+    <span class="middot-divider"></span>
+    <span>{{ . }}</span>
+    {{ end }}
+  </div>
+  {{ end }}
+
+  {{ if and $show_authors $item.Params.authors }}
+  <div class="article-metadata">
+    {{ partial "page_metadata_authors" $item }}
+  </div>
+  {{ end }}
+
+  {{ if $has_attachments }}
+  <div class="btn-links">
+    {{ partial "page_links" (dict "page" $item "is_list" 1) }}
+  </div>
+  {{ end }}
+
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/breadcrumb_helper.html ======
+{{ with .Parent }}
+  {{ partial "breadcrumb_helper" . }}
+  <li class="breadcrumb-item">
+    <a href="{{ .RelPermalink }}">
+      {{ if .IsHome }}
+        {{ (i18n "home" | default "Home") | emojify }}
+      {{ else }}
+        {{ .LinkTitle | emojify }}
+      {{ end }}
+    </a>
+  </li>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/book_sidebar.html ======
+
+<nav class="collapse docs-links" id="docs-nav">
+  {{ $current_node := . }}
+  {{ $menu_name := "" }}
+  {{ $order_by := site.Params.books.order_by | default "weight" }}
+  {{ $query := "" }}
+  {{ $root_page := .GetPage "/_index.md" }}
+  {{ $is_root := false}}
+
+  {{/* Case where homepage is a book */}}
+  {{ if $root_page | and (eq $root_page.Type "book") }}
+    {{ $is_root = true}}
+    <ul class="nav docs-sidenav">
+      <li class="{{ if .IsHome }}active{{ end }}"><a href="{{ $root_page.RelPermalink }}">{{$root_page.Title}}</a></li>
+    </ul>
+    {{- if eq $order_by "title" -}}
+      {{- $query = .Site.Home.Sections.ByTitle  -}}
+    {{- else if eq $order_by "title_desc" -}}
+      {{- $query = .Site.Home.Sections.ByTitle.Reverse  -}}
+    {{- else -}}
+      {{- $query = .Site.Home.Sections.ByWeight -}}
+    {{- end}}
+
+  {{else}}
+    {{/* Case where homepage is NOT a book */}}
+
+    {{ if eq .FirstSection.Type "book" }}
+      {{/* Case where first section is a book. */}}
+
+      {{ $menu_name = (path.Base (path.Split .FirstSection).Dir) }}
+      {{- if eq $order_by "title" -}}
+        {{- $query = where .Site.Home.Sections.ByTitle "Section" $menu_name -}}
+      {{- else if eq $order_by "title_desc" -}}
+        {{- $query = where .Site.Home.Sections.ByTitle.Reverse "Section" $menu_name -}}
+      {{- else -}}
+        {{- $query = where .Site.Home.Sections.ByWeight "Section" $menu_name -}}
+      {{- end -}}
+
+      {{- range $query -}}
+        {{ template "book-menu" dict "sect" . "current_node" $current_node "order_by" $order_by "is_root" $is_root }}
+      {{- end -}}
+
+    {{ else }}
+      {{/* Case where first section is a general page (e.g. book of books). */}}
+
+      <ul class="nav docs-sidenav">
+        <li><a href="{{.FirstSection.RelPermalink}}"><i class="fas fa-arrow-left pr-1"></i>{{.FirstSection.LinkTitle | emojify}}</a></li>
+      </ul>
+
+      {{ $first_node := $current_node }}
+      {{ if ne .Parent .FirstSection }}
+        {{ if ne .Parent.Parent .FirstSection }}
+          {{ $first_node = $current_node.Parent.Parent }}
+        {{else}}
+          {{ $first_node = $current_node.Parent }}
+        {{end}}
+      {{end}}
+
+      {{- if eq $order_by "title" -}}
+        {{- $query = $first_node.Pages.ByTitle -}}
+      {{- else if eq $order_by "title_desc" -}}
+        {{- $query =  $first_node.Pages.ByTitle.Reverse -}}
+      {{- else -}}
+        {{- $query =  $first_node.Pages.ByWeight -}}
+      {{- end -}}
+      {{ template "book-menu" dict "sect" $first_node "current_node" $current_node "order_by" $order_by "is_root" $is_root }}
+    {{end}}
+  {{end}}
+</nav>
+
+====== themes/custom-wowchemy-theme/layouts/partials/jsonld/article.html ======
+{{- $page := .page }}
+{{ $summary := .summary }}
+{{ $featured_image := ($page.Resources.ByType "image").GetMatch "*featured*" }}
+
+{{/* Get schema type. */}}
+{{ $schema := "Article" }}
+{{ if eq $page.Type "post" }}
+  {{ $schema = "BlogPosting" }}
+{{ end }}
+
+{{ $author := partial "functions/get_author_name" $page }}
+{{ $publisher := site.Params.org_name | default site.Title }}
+{{ $logo_url := partial "functions/get_logo_url" $page -}}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": {{$schema}},
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": {{$page.Permalink}}
+  },
+  "headline": {{$page.Title}},
+  {{ if $featured_image }}
+  "image": [
+    {{$featured_image.Permalink}}
+  ],
+  {{end}}
+  "datePublished": {{ $page.PublishDate.Format "2006-01-02T15:04:05Z07:00" }},
+  "dateModified": {{ $page.Lastmod.Format "2006-01-02T15:04:05Z07:00" }},
+  {{with $author}}
+  "author": {
+    "@type": "Person",
+    "name": {{.}}
+  },
+  {{end}}
+  "publisher": {
+    "@type": "Organization",
+    "name": {{$publisher}},
+    "logo": {
+      "@type": "ImageObject",
+      "url": {{$logo_url}}
+    }
+  },
+  "description": {{$summary}}
+}
+</script>
+
+====== themes/custom-wowchemy-theme/layouts/partials/jsonld/main.html ======
+{{ $page := .page }}
+{{ $summary := .summary }}
+{{ $site_type := site.Params.site_type | default "Person" }}
+
+{{- if $page.IsHome -}}
+
+  {{ partialCached "jsonld/website.html" $page }}
+
+  {{ if ne $site_type "Person" }}
+    {{ partial "jsonld/business.html" $page }}
+  {{ end }}
+
+{{- else if $page.IsPage -}}
+
+  {{ if (eq $page.Type "post") | or (eq $page.Type "publication") | or (eq $page.Type "project") }}
+    {{ partial "jsonld/article.html" (dict "page" $page "summary" $summary) }}
+  {{ end }}
+
+  {{ if eq $page.Type "event" }}
+    {{ partial "jsonld/event.html" (dict "page" $page "summary" $summary) }}
+  {{ end }}
+
+{{- end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/jsonld/event.html ======
+{{ $page := .page }}
+{{ $summary := .summary }}
+{{ $featured_image := ($page.Resources.ByType "image").GetMatch "*featured*" }}
+{{ $author := partial "functions/get_author_name" $page }}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": {{$page.Permalink}}
+  },
+  "name": {{$page.Title}},
+  {{ with $page.Params.location }}
+  "location": {
+    "@type": "Place",
+    "name": {{. | plainify}}{{if $page.Params.address}},
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": {{$page.Params.address.street | default ""}},
+      "addressLocality": {{$page.Params.address.city | default ""}},
+      "postalCode": {{$page.Params.address.postcode | default ""}},
+      "addressRegion": {{$page.Params.address.region | default ""}},
+      "addressCountry": {{$page.Params.address.country | default ""}}
+    }
+    {{end}}
+  },
+  {{end}}
+  {{ if $featured_image }}
+  "image": [
+    {{$featured_image.Permalink}}
+  ],
+  {{end}}
+  "startDate": {{ $page.Date.Format "2006-01-02T15:04:05Z07:00" }},
+  {{with $page.Params.date_end}}
+  "endDate": {{ (time .).Format "2006-01-02T15:04:05Z07:00" }},
+  {{end}}
+  {{with $author}}
+  "performer": {
+    "@type": "Person",
+    "name": {{.}}
+  },
+  {{end}}
+  "description": {{$summary}}
+}
+</script>
+
+====== themes/custom-wowchemy-theme/layouts/partials/jsonld/website.html ======
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  {{- if site.Params.search.provider }}
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {{ printf "%s?q={search_term_string}" site.BaseURL }},
+    "query-input": "required name=search_term_string"
+  },
+  {{end -}}
+  "url": {{site.BaseURL}}
+}
+</script>
+
+====== themes/custom-wowchemy-theme/layouts/partials/jsonld/business.html ======
+{{- $sharing_image := resources.GetMatch (path.Join "media" "sharing.*") -}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": {{site.Params.local_business_type | default site.Params.site_type}},
+  "@id": {{site.BaseURL}},
+  "name": {{site.Params.org_name | default site.Title}},
+  "logo": {{ partial "functions/get_logo_url" . }},
+  {{with $sharing_image}}"image": {{.Permalink}},{{end}}
+  {{ if (eq site.Params.site_type "LocalBusiness") | and site.Params.coordinates }}
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": {{site.Params.coordinates.latitude}},
+    "longitude": {{site.Params.coordinates.longitude}}
+  },
+  {{end}}
+  {{ with site.Params.address }}
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": {{ .street | default "" }},
+    "addressLocality": {{ .city | default "" }},
+    "addressRegion": {{ .region | default "" }},
+    "postalCode": {{ .postcode | default "" }},
+    "addressCountry": {{ .country_code | default .country | default "" }}
+  },
+  {{end}}
+  {{ with site.Params.phone }}"telephone": {{.}},{{end}}
+  "url": {{site.BaseURL}}
+}
+</script>
+
+====== themes/custom-wowchemy-theme/layouts/partials/portfolio_li_card.html ======
+{{ $item := .item }}
+{{ $widget := .widget }}
+{{ $link := .link }}
+{{ $target := .target }}
+{{ $has_attachments := partial "functions/has_attachments" $item }}
+
+{{/* Get summary. */}}
+{{ $summary := "" }}
+{{ if $item.Params.summary }}
+  {{ $summary = $item.Params.summary | markdownify | emojify }}
+{{ else if .Params.abstract }}
+  {{ $summary = .Params.abstract | markdownify | emojify | truncate (site.Params.abstract_length | default 135) }}
+{{ else if $item.Summary }}
+  {{ $summary = $item.Summary }}
+{{ end }}
+
+{{ $resource := ($item.Resources.ByType "image").GetMatch "*featured*" }}
+{{ $js_tag_classes := delimit (apply (apply $item.Params.tags "replace" "." " " "-") "printf" "js-id-%s" ".") " " }}
+
+<div class="project-card project-item isotope-item {{ $js_tag_classes | safeHTMLAttr }}">
+  <div class="card">
+    {{ with $resource }}
+    {{ $image := .Resize "550x" }}
+    <a href="{{ $link }}" {{ $target | safeHTMLAttr }} class="card-image hover-overlay">
+      <img src="{{ $image.RelPermalink }}" alt="{{ $item.Title }}" class="img-responsive" loading="lazy">
+    </a>
+    {{ end }}
+    <div class="card-text">
+      <h4><a href="{{ $link }}" {{ $target | safeHTMLAttr }}>{{ $item.Title | markdownify | emojify }}</a></h4>
+
+      {{ with $summary }}
+      <div class="article-style">
+        <p>{{ . }}</p>
+      </div>
+      {{ end }}
+
+      {{ if $has_attachments }}
+      <div class="btn-links">
+        {{ partial "page_links" (dict "page" $item "is_list" 1) }}
+      </div>
+      {{ end }}
+    </div>
+  </div>
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/page_author_card.html ======
+{{ $page := .page }}
+{{ $author_page := .author_page }}
+{{ $site_type := site.Params.site_type | default "Person" }}
+{{- $has_profile := not (eq nil $author_page.Params.superuser) -}}
+
+{{/* Check an author profile exists. */}}
+{{ if $has_profile }}
+  {{/* If it's a personal site and primary page author is superuser, link to the homepage rather than their profile page. */}}
+  {{ $profile_url := $author_page.RelPermalink }}
+  {{ if and (eq $site_type "Person") (eq $author_page.Params.superuser true) }}
+    {{ $profile_url = site.BaseURL }}
+  {{ end }}
+  {{ $avatar := ($author_page.Resources.ByType "image").GetMatch "*avatar*" }}
+  {{ $avatar_shape := site.Params.avatar.shape | default "circle" }}
+  <div class="media author-card content-widget-hr">
+    {{ if and site.Params.avatar.gravatar $author_page.Params.email }}
+      {{if $profile_url}}<a href="{{$profile_url}}">{{end}}<img class="avatar mr-3 {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="https://s.gravatar.com/avatar/{{ md5 $author_page.Params.email }}?s=200" alt="{{$author_page.Title}}">{{if $profile_url}}</a>{{end}}
+    {{ else if $avatar }}
+      {{ $avatar_image := $avatar.Fill "270x270 Center" }}
+      {{if $profile_url}}<a href="{{$profile_url}}">{{end}}<img class="avatar mr-3 {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="{{ $avatar_image.RelPermalink }}" alt="{{$author_page.Title}}">{{if $profile_url}}</a>{{end}}
+    {{ end }}
+
+    <div class="media-body">
+      <h5 class="card-title">{{if $profile_url}}<a href="{{$profile_url}}">{{end}}{{$author_page.Title}}{{if $profile_url}}</a>{{end}}</h5>
+      {{ with $author_page.Params.role }}<h6 class="card-subtitle">{{. | markdownify | emojify}}</h6>{{end}}
+      {{ with $author_page.Params.bio }}<p class="card-text">{{. | markdownify | emojify}}</p>{{end}}
+      {{ partial "social_links" $author_page }}
+    </div>
+  </div>
+{{end}}{{/* Profile page block */}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/search.html ======
+{{/* Partial for built-in search and Algolia search. */}}
+{{ $search_provider := lower site.Params.search.provider }}
+{{ if in (slice "wowchemy" "algolia") $search_provider }}
+<aside class="search-modal" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>{{ i18n "search" }}</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#" aria-label="{{i18n "close" | default "Close"}}"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        {{ if eq $search_provider "wowchemy" }}
+        <input name="q" id="search-query" placeholder="{{i18n "search_placeholder"}}" autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search" class="form-control"
+        aria-label="{{i18n "search_placeholder"}}">
+        {{ else }}
+        <!-- Search box will appear here -->
+        {{ end }}
+      </div>
+
+      {{ $search_queries := false }}
+      {{ if isset site.Data (printf "search_queries.%s" .Site.Language.Lang) }}
+        {{ $search_queries = index site.Data (printf "search_queries.%s" .Site.Language.Lang) }}
+      {{ else if isset site.Data "search_queries" }}
+        {{ $search_queries = site.Data.search_queries }}
+      {{end}}
+
+      {{ if eq $search_provider "wowchemy" | and $search_queries }}
+      <div id="search-common-queries" class="pt-3">
+        <div class="font-weight-bold pb-3">{{ i18n "search_common_queries" | default "Common searches" }}</div>
+        <ul class="fa-ul">
+          {{ range $search_queries }}
+            <li class="pb-3">
+              <a href="{{.link | relURL}}"><i class="fa-li fas fa-search" aria-hidden="true"></i><span class="pl-1">{{.query | markdownify | emojify}}</span></a>
+            </li>
+          {{ end }}
+        </ul>
+      </div>
+      {{ end }}
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        <!-- Search results will appear here -->
+      </div>
+
+    </section>
+  </div>
+</aside>
+{{end}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/page_footer.html ======
+{{ partial "page_edit" . }}
+{{ partial "tags" . }}
+{{ partial "share" . }}
+{{ partial "page_author" . }}
+{{ partial "comments" . }}
+
+{{ if site.Params.section_pager }}
+<div class="article-widget">
+  {{ partial "section_pager" . }}
+</div>
+{{ end }}
+
+{{ partial "page_related" . }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/li_citation.html ======
+{{ $has_attachments := partial "functions/has_attachments" . }}
+
+<div class="pub-list-item" style="margin-bottom: 1rem">
+  <i class="far fa-file-alt pub-icon" aria-hidden="true"></i>
+
+  {{/* APA Style */}}
+  {{ if eq (site.Params.publications.citation_style | default "apa") "apa" }}
+
+  <span class="article-metadata li-cite-author">
+    {{ partial "page_metadata_authors" . }}
+  </span>
+  ({{- .Date.Format "2006" -}}).
+  <a href="{{ .RelPermalink }}">{{ .Title }}</a>.
+  {{ if .Params.publication_short }}
+  {{- .Params.publication_short | markdownify -}}.
+  {{ else if .Params.publication }}
+  {{- .Params.publication | markdownify -}}.
+  {{ end }}
+  <p>{{ partial "page_links" (dict "page" . "is_list" 1) }}</p>
+
+  {{/* MLA Style */}}
+  {{ else }}
+
+  <span class="article-metadata li-cite-author">
+    {{ partial "page_metadata_authors" . }}.
+  </span>
+  <a href="{{ .RelPermalink }}">{{ .Title }}</a>.
+  {{ if .Params.publication_short }}
+  {{- .Params.publication_short | markdownify -}},
+  {{ else if .Params.publication }}
+  {{- .Params.publication | markdownify -}},
+  {{ end }}
+  {{- .Date.Format "2006" -}}.
+
+  {{ if $has_attachments }}
+  <div class="btn-links">
+    {{ partial "page_links" (dict "page" . "is_list" 1) }}
+  </div>
+  {{ end }}
+
+  {{ end }}
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/functions/has_attachments.html ======
+{{/* Return true if the page has attachments or link buttons to display. */}}
+
+{{ $page := . }}
+
+{{ $pdf_link := false }}
+{{ $slug := $page.File.ContentBaseName }}
+{{ $resource := $page.Resources.GetMatch (printf "%s.pdf" $slug) }}
+{{ with $resource }}
+  {{ $pdf_link = true }}
+{{ end }}
+
+{{ $cite_link := false }}
+{{ $resource := $page.Resources.GetMatch "cite.bib" }}
+{{ with $resource }}
+  {{ $cite_link = true }}
+{{ end }}
+
+{{ return ($cite_link | or $pdf_link | or .Params.url_preprint | or .Params.url_pdf | or .Params.url_slides | or .Params.url_video | or .Params.url_source | or .Params.url_code | or .Params.url_dataset | or .Params.url_poster | or .Params.url_project | or .Params.doi | or .Params.links | or .Params.projects | or .Params.slides) }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/functions/get_author_name.html ======
+{{/* Get name of primary author. */}}
+
+{{ $page := . }}
+
+{{/* Get publisher as fall back. */}}
+{{ $publisher := site.Params.org_name | default site.Title }}
+
+{{ $author := "" }}
+{{ $author_username := "" }}
+
+{{ if and (not $page.Params.authors) ($page.Scratch.Get "superuser_username") }}
+  {{ $author_username = $page.Scratch.Get "superuser_username" }}
+{{ else if $page.Params.authors }}
+  {{ $author = index $page.Params.authors 0 }}
+  {{ $author_username = urlize $author }}
+{{ end }}
+
+{{ $taxonomy := "authors" }}
+{{ $profile_page := site.GetPage (printf "/%s/%s" $taxonomy $author_username) }}
+{{ with $profile_page }}
+  {{ $author = .Title }}
+{{ else }}
+  {{ $author = $author | default $publisher }}
+{{ end }}
+
+{{ return $author }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/functions/parse_theme.html ======
+{{- $scr := .Scratch -}}
+
+{{/* Get name of site's Theme. Precedence: Params.toml > Default (Minimal) */}}
+{{- $theme_index := (site.Params.theme | lower | replaceRE "\\s" "_") | default "minimal" -}}
+
+{{/* Get name of site's Font Set. Precedence: Params.toml > Theme > Default (Minimal) */}}
+{{- $font_index := (site.Params.font | lower | replaceRE "\\s" "_") | default ((index site.Data.themes $theme_index).font | lower | replaceRE "\\s" "_") | default $theme_index -}}
+{{- $font_index := cond (isset site.Data.fonts $font_index) $font_index "minimal" -}}
+
+{{/* Get Font Size. */}}
+
+{{- $font_size := lower site.Params.font_size | default "l" -}}
+{{- $font_sizes := dict "xs" 14 "s" 16 "m" 18 "l" 21 "xl" 23 -}}
+{{- $font_size_numeric := (index $font_sizes $font_size) | default (index $font_sizes "l") -}}
+{{- $scr.Set "font_size" $font_size_numeric -}}
+{{- $scr.Set "font_size_small" (mul 0.77 $font_size_numeric) -}}
+
+{{/* Load Font Set. */}}
+
+{{- $font := index site.Data.fonts $font_index -}}
+{{- $scr.Set "google_fonts" $font.google_fonts -}}
+{{- $scr.Set "body_font" $font.body_font -}}
+{{- $scr.Set "heading_font" $font.heading_font -}}
+{{- $scr.Set "nav_font" $font.nav_font -}}
+{{- $scr.Set "mono_font" $font.mono_font -}}
+
+{{/* Load Theme. */}}
+
+{{ $theme := index site.Data.themes $theme_index }}
+
+{{/* Legacy support for `light` as boolean rather than map. */}}
+{{ $light_is_map := reflect.IsMap "light" }}
+{{ $light_theme := dict }}
+{{ if $light_is_map }}
+  {{ $scr.Set "light" ($theme.is_light | default true) }}
+  {{ $light_theme = $theme.light }}
+{{ else }}
+  {{ $scr.Set "light" ($theme.light | default true) }}
+{{ end }}
+
+{{ if ($scr.Get "light") }}
+  {{- $scr.Set "background" ($theme.background | default "rgb(255, 255, 255)") -}}
+  {{- $scr.Set "dark_background" ($theme.dark.background | default "hsla(231, 15%, 16%, 1)") -}}
+  {{- $scr.Set "home_section_odd" ($theme.home_section_odd | default "rgb(255, 255, 255)") -}}
+  {{- $scr.Set "home_section_even" ($theme.home_section_even | default "rgb(247, 247, 247)") -}}
+  {{- $scr.Set "dark_home_section_odd" ($theme.dark.home_section_odd | default "hsla(231, 15%, 18%, 1)") -}}
+  {{- $scr.Set "dark_home_section_even" ($theme.dark.home_section_even | default "hsla(231, 15%, 16%, 1)") -}}
+{{ else }}
+  {{- $scr.Set "background" ($light_theme.background | default "rgb(255, 255, 255)") -}}
+  {{- $scr.Set "dark_background" ($theme.background | default "rgb(40, 42, 54)") -}}
+  {{- $scr.Set "home_section_odd" ($light_theme.home_section_odd | default "rgb(255, 255, 255)") -}}
+  {{- $scr.Set "home_section_even" ($light_theme.home_section_even | default "rgb(247, 247, 247)") -}}
+  {{- $scr.Set "dark_home_section_odd" ($theme.home_section_odd | default "hsla(231, 15%, 18%, 1)") -}}
+  {{- $scr.Set "dark_home_section_even" ($theme.home_section_even | default "hsla(231, 15%, 16%, 1)") -}}
+{{ end }}
+
+{{- $scr.Set "link" ($theme.link | default $theme.primary) -}}
+{{- $scr.Set "link_hover" ($theme.link_hover | default $theme.primary) -}}
+{{- $scr.Set "dark_link" ($theme.dark.link | default $theme.primary) -}}
+{{- $scr.Set "dark_link_hover" ($theme.dark.link_hover | default $theme.primary) -}}
+
+{{- $scr.Set "link_decoration" ($theme.link_decoration | default "inherit") -}}
+
+{{- $scr.Set "primary" $theme.primary -}}
+
+{{- $scr.Set "menu_primary" $theme.menu_primary -}}
+{{- $scr.Set "menu_text" $theme.menu_text -}}
+{{- $scr.Set "menu_text_active" $theme.menu_text_active -}}
+{{- $scr.Set "menu_title" $theme.menu_title -}}
+
+{{- $scr.Set "dark_menu_primary" ($theme.dark.menu_primary | default "rgb(40, 42, 54)") -}}
+{{- $scr.Set "dark_menu_text" ($theme.dark.menu_text | default "white") -}}
+{{- $scr.Set "dark_menu_text_active" ($theme.dark.menu_text_active | default "rgba(255, 255, 255, 0.8)") -}}
+{{- $scr.Set "dark_menu_title" ($theme.dark.menu_title | default "white") -}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/functions/get_address.html ======
+{{/* Function to return a formatted address given a semantic address. */}}
+
+{{/* Check for valid site config. */}}
+{{ if not site.Data.address_formats }}{{errorf "Address formats missing from `data/address_formats.toml`!"}}{{end}}
+
+{{ $page := . }}
+{{ $address := .address }}
+{{ $format_name := $page.Params.address_format | default site.Params.address_format | default "en-us" }}
+
+{{ if not (isset site.Data.address_formats $format_name) }}{{ errorf "Address format `%s` missing from `data/address_formats.toml`!" $format_name }}{{end}}
+
+{{ $format := index site.Data.address_formats $format_name }}
+{{ $address_display := slice }}
+
+{{ range $k, $v := $format.order }}
+  {{ if eq $v "street" | and $address.street }}{{$address_display = $address_display | append $address.street | append (index $format.delimiters $k | default "") }}{{end}}
+  {{ if eq $v "city" | and $address.city }}{{$address_display = $address_display | append $address.city | append (index $format.delimiters $k | default "") }}{{end}}
+  {{ if eq $v "region" | and $address.region }}{{$address_display = $address_display | append $address.region | append (index $format.delimiters $k | default "") }}{{end}}
+  {{ if eq $v "postcode" | and $address.postcode }}{{$address_display = $address_display | append $address.postcode | append (index $format.delimiters $k | default "") }}{{end}}
+  {{ if eq $v "country" | and $address.country }}{{$address_display = $address_display | append $address.country | append (index $format.delimiters $k | default "") }}{{end}}
+{{end}}
+
+{{ return (delimit $address_display "") }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/functions/get_social_link.html ======
+{{/* Function to return a linked social icon as a map from an iteration of an author's `social` data. */}}
+
+{{ $scr := newScratch }}
+
+{{/* Get icon name. */}}
+{{ $scr.SetInMap "social_link" "icon" .icon }}
+
+{{/* Get icon pack (default to Font Awesome's Solid pack). */}}
+{{ $pack := or .icon_pack "fas" }}
+{{ $scr.SetInMap "social_link" "icon_pack" $pack }}
+
+{{/* Derive Font Awesome class name prefix. */}}
+{{ $pack_prefix := $pack }}
+{{ if in (slice "fab" "fas" "far" "fal") $pack }}
+  {{ $pack_prefix = "fa" }}
+{{ end }}
+{{ $scr.SetInMap "social_link" "pack_prefix" $pack_prefix }}
+
+{{/* Get tooltip label (default to none). */}}
+{{ $scr.SetInMap "social_link" "tooltip" (.label | default "") }}
+
+{{/* Get screen reader label (default to icon name). */}}
+{{ $scr.SetInMap "social_link" "aria_label" (.label | default .icon) }}
+
+{{/* Get external link or relative internal link. */}}
+{{ $link := .link }}
+{{ $target := "" }}
+{{ $scheme := (urls.Parse $link).Scheme }}
+{{ if not $scheme }}
+  {{ $link = .link | relLangURL }}
+{{ else if in (slice "http" "https") $scheme }}
+  {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+{{ end }}
+{{ $scr.SetInMap "social_link" "link" $link }}
+{{ $scr.SetInMap "social_link" "target" $target }}
+
+{{ return $scr.Get "social_link" }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/functions/get_pub_types.html ======
+{{/* Get Publication Types */}}
+{{ $pub_types := slice }}
+{{ range site.Data.publication_types.types }}
+  {{ $pub_types = $pub_types | append (i18n . | default "Uncategorized") }}
+{{ end }}
+{{ return $pub_types }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/functions/get_logo_url.html ======
+{{/* Function to get logo URL for JSONLD. */}}
+{{/* Inputs: page context */}}
+{{/* Output: logo URL (URL) */}}
+
+{{ $logo_url := "" }}
+{{ if resources.Get "media/logo.png" | or (resources.Get "media/logo.svg") }}
+  {{ $logo_url = (partial "functions/get_logo" (dict "constraint" "fit" "size" 192)).Permalink }}
+{{ else }}
+  {{ $logo_url = (partial "functions/get_icon" 192).Permalink }}
+{{ end }}
+
+{{ return $logo_url }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/functions/get_event_dates.html ======
+{{/* Function to get event start and end dates/times. */}}
+{{ $t1 := time .Date }}{{/* Start datetime. */}}
+{{ $str := slice ((time $t1).Format site.Params.date_format) }}{{/* Init return string with start date. */}}
+{{/* Show start time if not all day event. */}}
+{{ if not .Params.all_day }}{{ $str = $str | append ((time $t1).Format (site.Params.time_format)) }}{{ end }}
+{{/* Show event end date if provided. */}}
+{{ if .Params.date_end }}
+  {{ $str = $str | append "&mdash;" }}
+  {{ $t2 := time .Params.date_end}}{{/* End datetime. */}}
+  {{/* Show end date if it differs to start date. */}}
+  {{ if not (eq $t1.Year $t2.Year | and (eq $t1.Month $t2.Month) | and (eq $t1.Day $t2.Day)) }}
+    {{ $str = $str | append ((time $t2).Format site.Params.date_format) }}
+  {{ end }}
+  {{/* Show end time if not all day event. */}}
+  {{ if not .Params.all_day }}{{ $str = $str | append ((time $t2).Format (site.Params.time_format)) }}{{ end }}
+{{ end }}
+{{ return (delimit $str " ") }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/functions/get_icon.html ======
+{{/* Function to get website icon image. */}}
+{{/* Input: size (int) */}}
+{{/* Output: resource (obj) */}}
+
+{{ $icon := resources.GetMatch "media/icon.png" }}
+{{ $icon_resized := $icon.Fill (printf "%sx%s Center" (string .) (string .)) }}
+{{ return $icon_resized }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/functions/get_logo.html ======
+{{/* Function to get logo image. */}}
+{{/* Inputs: constraint: max_height/fit (str); size (int) */}}
+{{/* Output: resource (obj) */}}
+
+{{/* Workaround fact Hugo does not support GetMatch in assets dir */}}
+{{/* Hugo doesn't support image ops on SVG: https://discourse.gohugo.io/t/ho-do-i-convert-a-generic-resource-to-image-resource/22570/4 */}}
+{{ $logo := resources.Get "media/logo.png" | default (resources.Get "media/logo.svg") }}
+{{ $logo_proc := $logo }}
+
+{{/* If the type of image can be resized by Hugo, resize it given a `.size` argument to the function. */}}
+{{ if resources.Get "media/logo.png" }}
+  {{ if eq .constraint "max_height" }}
+    {{/* Resize logo to fit specified max height. */}}
+    {{ $logo_proc = ($logo.Resize (printf "x%s" (string .size))) }}
+  {{ else }}
+    {{/* Constrain logo to fit within specified dimensions. */}}
+    {{ $logo_proc = ($logo.Fit (printf "%sx%s" (string .size) (string .size))) }}
+  {{ end }}
+{{ end }}
+
+{{ return $logo_proc }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/hero.html ======
+{{ $ := .root }}
+{{ $page := .page }}
+{{ $bg := $page.Params.design.background }}
+
+{{ if $page.Params.hero_media }}
+<div class="row">
+  <div class="col-12 col-md-6 text-center text-md-left">
+{{ end }}
+
+    {{ with $page.Title }}
+      <h1 class="hero-title">{{ . | markdownify }}</h1>
+    {{ end }}
+
+    {{ with $page.Content }}
+      <div class="hero-lead">{{ . }}</div>
+    {{ end }}
+
+    {{/* Call-to-action link */}}
+    {{ if $page.Params.cta.url }}
+      {{ $pack := or $page.Params.cta.icon_pack "fas" }}
+      {{ $pack_prefix := $pack }}
+      {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+        {{ $pack_prefix = "fa" }}
+      {{ end }}
+      {{ $link := $page.Params.cta.url }}
+      {{ $scheme := (urls.Parse $link).Scheme }}
+      {{ $target := "" }}
+      {{ if not $scheme }}
+        {{ $link = $link | relLangURL }}
+      {{ else if in (slice "http" "https") $scheme }}
+        {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+      {{ end }}
+    <p class="cta-btns">
+      <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }} class="btn {{if $bg.text_color_light}}btn-light{{else}}btn-primary{{end}} btn-lg mb-3 mb-md-1">{{ if $page.Params.cta.icon }}<i class="{{ $pack }} {{ $pack_prefix }}-{{ $page.Params.cta.icon }} pr-1" aria-hidden="true"></i>{{end}}{{ $page.Params.cta.label | markdownify | emojify | safeHTML }}</a>
+
+      {{/* Alternative Call-to-action link */}}
+      {{ if $page.Params.cta_alt.url }}
+        {{ $link := $page.Params.cta_alt.url }}
+        {{ $scheme := (urls.Parse $link).Scheme }}
+        {{ $target := "" }}
+        {{ if not $scheme }}
+          {{ $link = $link | relLangURL }}
+        {{ else if in (slice "http" "https") $scheme }}
+          {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+        {{ end }}
+      <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }} class="hero-cta-alt btn-lg pl-md-4">{{ $page.Params.cta_alt.label | markdownify | emojify | safeHTML }} <i class="fas fa-angle-right"></i></a>
+      {{ end }}
+    </p>
+    {{ end }}
+
+    {{/* Call-to-action note */}}
+    {{ with $page.Params.cta_note }}
+    <p class="hero-note text-muted mb-3 mb-md-1">
+      {{ .label | markdownify | emojify | safeHTML }}
+    </p>
+    {{ end }}
+
+  {{/* Hero image */}}
+  {{ if $page.Params.hero_media }}
+  </div>
+  <div class="col-12 mx-auto col-md-6 {{if $page.Params.design.flip}}order-md-first{{end}} hero-media">
+    {{- $image := ($page.Parent.Resources.ByType "image").GetMatch $page.Params.hero_media -}}
+    {{- if not $image -}}
+      {{- $image = resources.Get (path.Join "media" $page.Params.hero_media) -}}
+    {{- end -}}
+    {{ if $image }}
+      {{ $isSVG := eq $image.MediaType.SubType "svg" }}
+      {{ if $isSVG -}}
+
+        <img src="{{ $image.RelPermalink }}" alt="{{ $page.Title }}">
+
+      {{- else }}
+
+        {{ $legacy_img := $image.Resize "400x" }}
+        {{ $img_src := "" }}
+        {{ $img_src_set := slice }}
+        {{ $widths := slice 1200 800 400 }}
+
+        {{ range $widths }}
+          {{ $src_link := ($image.Resize (printf "%dx" .)).RelPermalink }}
+          {{ if eq $img_src "" }}
+            {{ $img_src = $src_link }}
+          {{ end }}
+          {{ $img_src_set = $img_src_set | append (printf "%s %dw" $src_link .) }}
+        {{ end }}
+        {{ $img_src_set = delimit $img_src_set "," }}
+
+        <img src="{{ $legacy_img.RelPermalink }}" srcset="{{ $img_src_set }}" width="{{ $image.Width }}" height="{{ $image.Height }}" alt="{{ $page.Title }}">
+      {{ end }}
+    {{ end }}
+  </div>
+</div>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/people.html ======
+{{/* People Widget */}}
+
+{{/* Initialise */}}
+{{ $ := .root }}
+{{ $page := .page }}
+{{ $show_social := $page.Params.design.show_social | default false }}
+{{ $show_interests := $page.Params.design.show_interests | default true }}
+{{ $show_organizations := $page.Params.design.show_organizations | default false }}
+{{ $show_role := $page.Params.design.show_role | default true }}
+
+<div class="row justify-content-center people-widget">
+  {{ with $page.Title }}
+  <div class="col-md-12 section-heading">
+    <h1>{{ . | markdownify | emojify }}</h1>
+    {{ if $page.Params.subtitle }}<p>{{ $page.Params.subtitle | markdownify | emojify }}</p>{{ end }}
+  </div>
+  {{ end }}
+
+  {{ with $page.Content }}
+  <div class="col-md-12">
+    {{ . }}
+  </div>
+  {{ end }}
+
+  {{ range $page.Params.content.user_groups }}
+  {{ $query := where (where site.Pages "Section" "authors") ".Params.user_groups" "intersect" (slice .) }}
+
+  {{if $query | and (gt (len $page.Params.content.user_groups) 1) }}
+  <div class="col-md-12">
+    <h2 class="mb-4">{{ . | markdownify }}</h2>
+  </div>
+  {{end}}
+
+  {{ range $query }}
+  {{ $avatar := (.Resources.ByType "image").GetMatch "*avatar*" }}
+  {{/* Get link to user's profile page. */}}
+  {{ $link := "" }}
+  {{ with site.GetPage (printf "/authors/%s" (path.Base (path.Split .Path).Dir)) }}
+    {{ $link = .RelPermalink }}
+  {{ end }}
+  <div class="col-12 col-sm-auto people-person">
+    {{ $src := "" }}
+    {{ if site.Params.avatar.gravatar }}
+      {{ $src = printf "https://s.gravatar.com/avatar/%s?s=150" (md5 .Params.email) }}
+    {{ else if $avatar }}
+      {{ $avatar_image := $avatar.Fill "270x270 Center" }}
+      {{ $src = $avatar_image.RelPermalink }}
+    {{ end }}
+    {{ if $src }}
+      {{ $avatar_shape := site.Params.avatar.shape | default "circle" }}
+      {{with $link}}<a href="{{.}}">{{end}}<img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="{{ $src }}" alt="Avatar">{{if $link}}</a>{{end}}
+    {{ end }}
+
+    <div class="portrait-title">
+      <h2>{{with $link}}<a href="{{.}}">{{end}}{{ .Title }}{{if $link}}</a>{{end}}</h2>
+      {{ if and $show_organizations .Params.organizations }}{{ range .Params.organizations }}<h3>{{ .name }}</h3>{{ end }}{{ end }}
+      {{ if and $show_role .Params.role }}<h3>{{ .Params.role | markdownify | emojify }}</h3>{{ end }}
+      {{ if $show_social }}{{ partial "social_links" . }}{{ end }}
+      {{ if and $show_interests .Params.interests }}<p class="people-interests">{{ delimit .Params.interests ", " | markdownify | emojify }}</p>{{ end }}
+    </div>
+  </div>
+  {{ end }}
+  {{ end }}
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/about.html ======
+{{ $ := .root }}
+{{ $page := .page }}
+
+{{ $author := "" }}
+{{ if .author }}
+  {{ $author = .author }}
+{{ else }}
+  {{ $author = $page.Params.author }}
+{{end}}
+
+{{ $person_page_path := (printf "authors/%s" $author) }} <!-- Removed leading slash -->
+{{ $person_page := site.GetPage $person_page_path }}
+{{ if not $person_page }}
+  {{ errorf "Could not find an author page at `%s`. Please check the value of `author` in your About widget and create an associated author page if one does not already exist. See https://wowchemy.com/docs/page-builder/#about " $person_page_path }}
+{{end}}
+{{ $person := $person_page.Params }}
+{{ $avatar := ($person_page.Resources.ByType "image").GetMatch "*avatar*" }}
+{{ $avatar_shape := site.Params.avatar.shape | default "circle" }}
+
+<!-- About widget -->
+<div>
+  <a class="background-img" href="#img1"><img id="img1" src="img/mountains.jpg" /></a>
+</div>
+  
+<div class="row">
+  <div class="col-12 col-lg-4">
+    <div id="profile">
+
+      {{ if site.Params.avatar.gravatar }}
+      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="https://s.gravatar.com/avatar/{{ md5 $person.email }}?s=270" alt="{{$person_page.Title}}">
+      {{ else if $avatar }}
+      {{ $avatar_image := $avatar.Fill "270x270 Center" }}
+      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="{{ $avatar_image.RelPermalink }}" alt="{{$person_page.Title}}">
+      {{ end }}
+
+      <div class="portrait-title">
+        <h2>{{ $person_page.Title }}</h2>
+        {{ with $person.role }}<h3>{{ . | markdownify | emojify }}</h3>{{ end }}
+
+        {{ range $person.organizations }}
+        <h3>
+          {{ with .url }}<a href="{{ . }}" target="_blank" rel="noopener">{{ end }}
+          <span>{{ .name }}</span>
+          {{ if .url }}</a>{{ end }}
+        </h3>
+        {{ end }}
+      </div>
+
+      <ul class="network-icon" aria-hidden="true">
+        {{ range $person.social }}
+        {{ $pack := or .icon_pack "fas" }}
+        {{ $pack_prefix := $pack }}
+        {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+          {{ $pack_prefix = "fa" }}
+        {{ end }}
+        {{ $link := .link }}
+        {{ $scheme := (urls.Parse $link).Scheme }}
+        {{ $target := "" }}
+        {{ if not $scheme }}
+          {{ $link = .link | relLangURL }}
+        {{ else if in (slice "http" "https") $scheme }}
+          {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+        {{ end }}
+        <li>
+          <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }} aria-label="{{ .icon }}">
+            <i class="{{ $pack }} {{ $pack_prefix }}-{{ .icon }} big-icon"></i>
+          </a>
+        </li>
+        {{ end }}
+      </ul>
+
+    </div>
+  </div>
+  <div class="col-12 col-lg-1">
+  </div>
+  <div class="col-12 col-lg-7">
+  <div class="vertical-center">
+
+    {{/* Only display widget title in explicit instances of about widget, not in author pages. */}}
+    {{ if and $page.Params.widget $page.Title }}<h1>{{ $page.Title | markdownify | emojify }}</h1>{{ end }}
+
+    <div class="article-style">
+      {{ $person_page.Content }}
+      <a class="btn btn-outline-primary btn-page-header" href="/files/cv.pdf" target="_blank" rel="noopener">DOWNLOAD CV</a>
+    </div>
+
+    <div class="row">
+
+      {{ with $person.interests }}
+      <div class="col-md-5">
+        <div class="section-subheading">{{ i18n "interests" | markdownify }}</div>
+        <ul class="ul-interests mb-0">
+          {{ range . }}
+          <li>{{ . | markdownify | emojify }}</li>
+          {{ end }}
+        </ul>
+      </div>
+      {{ end }}
+
+      {{ with $person.education }}
+      <div class="col-md-7">
+        <div class="section-subheading">{{ i18n "education" | markdownify }}</div>
+        <ul class="ul-edu fa-ul mb-0">
+          {{ range .courses }}
+          <li>
+            <i class="fa-li fas fa-graduation-cap"></i>
+            <div class="description">
+              <p class="course">{{ .course }}{{ with .year }}, {{ . }}{{ end }}</p>
+              <p class="institution">{{ .institution }}</p>
+            </div>
+          </li>
+          {{ end }}
+        </ul>
+      </div>
+      {{ end }}
+
+    </div>
+  </div>
+  </div>
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/tag_cloud.html ======
+{{/* Initialise */}}
+{{ $ := .root }}
+{{ $st := .page }}
+{{ $taxonomy := $st.Params.content.taxonomy | default "tags" }}
+{{ $fontSmall := $st.Params.design.font_size_min | default 0.8 }}
+{{ $fontBig := $st.Params.design.font_size_max | default 2.5 }}
+
+{{ $items_count := $st.Params.content.count }}
+{{ if eq $items_count 0 }}
+  {{ $items_count = 65535 }}
+{{ else }}
+  {{ $items_count = $items_count | default 20 }}
+{{ end }}
+
+{{/* Query */}}
+{{ $tags := first $items_count (index site.Taxonomies $taxonomy).ByCount }}
+{{ $count := len $tags }}
+
+{{ $columns := $st.Params.design.columns | default "2" }}
+
+<div class="col-12 {{if eq $columns "2"}}col-lg-8{{end}}">
+  {{ with $st.Content }}{{ . }}{{ end }}
+
+  {{ if ne $count 0 }}
+
+    {{ $fontDelta := sub $fontBig $fontSmall }}
+    {{/* Warning: Hugo's `Reverse` function appears to operate in-place, hence the order of performing $max/$min matters. */}}
+    {{ $max := add (len (index $tags 0).Pages) 1 }}
+    {{ $min := len (index ($tags).Reverse 0).Pages }}
+    {{ $delta := sub $max $min }}
+    {{ $fontStep := div $fontDelta $delta }}
+
+    <div class="tag-cloud">
+      {{ range $name, $term := (sort $tags ".Page.Title" "asc") }}
+        {{ $tagCount := len $term.Pages }}
+        {{ $weight := div (sub (math.Log $tagCount) (math.Log $min)) (sub (math.Log $max) (math.Log $min)) }}
+        {{ $fontSize := add $fontSmall (mul (sub $fontBig $fontSmall) $weight) }}
+        <a href="{{ .Page.RelPermalink }}" style="font-size:{{ $fontSize }}rem">{{ .Page.Title }}</a>
+      {{ end }}
+    </div>
+  {{ end }}
+
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/accomplishments.html ======
+{{ $ := .root }}
+{{ $page := .page }}
+{{ $columns := $page.Params.design.columns | default "2" }}
+
+<!-- Accomplishments widget -->
+<div class="col-12 {{if eq $columns "2"}}col-lg-8{{end}}">
+  {{ with $page.Content }}{{ . }}{{ end }}
+
+  {{ if $page.Params.item }}
+  {{ range $idx, $key := sort $page.Params.item ".date_start" "desc" }}
+    <div class="card experience course">
+      <div class="card-body">
+        {{- $svg_icon := resources.Get (printf "media/icons/brands/%s.svg" (replace (lower .organization) " " "_")) -}}
+        {{- if $svg_icon }}
+        <div class="d-flex align-content-start">
+          <div class="mr-2 mb-2">
+            {{- with .organization_url}}<a href="{{.}}" target="_blank" rel="noopener">{{end -}}
+            <img src="{{ $svg_icon.RelPermalink }}" width="56px" height="56px" alt="{{.organization | plainify}}">
+            {{- with .organization_url}}</a>{{end -}}
+          </div>
+          <div>
+        {{ end }}
+
+            {{- with .url -}}<a href="{{.}}" target="_blank" rel="noopener">{{- end -}}
+            <div class="section-subheading card-title exp-title text-muted my-0">{{.title | markdownify | emojify}}</div>
+            {{- with .url -}}</a>{{- end -}}
+
+            <div class="card-subtitle my-0 article-metadata">
+              {{- with .organization_url}}<a href="{{.}}" target="_blank" rel="noopener">{{end -}}
+              {{- .organization | markdownify | emojify -}}
+              {{- with .organization_url}}</a>{{end -}}
+
+              <span class="middot-divider"></span>
+
+              {{ (time .date_start).Format ($page.Params.date_format | default "Jan 2006") }}
+              {{ if .date_end}}
+              – {{ (time .date_end).Format ($page.Params.date_format | default "Jan 2006") }}
+              {{end}}
+            </div>
+
+        {{- if $svg_icon}}
+          </div>
+        </div>
+        {{end}}
+
+        {{with .description}}
+          <div class="card-text">{{. | markdownify | emojify}}</div>
+        {{end}}
+
+        {{ with .certificate_url }}
+          <a class="card-link" href="{{.}}" target="_blank" rel="noopener">
+            {{ i18n "see_certificate" | default "See certificate" }}
+          </a>
+        {{ end }}
+      </div>
+    </div>
+  {{end}}
+  {{end}}
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/featured.html ======
+{{/* Featured Content Widget */}}
+
+{{/* Initialise */}}
+{{ $ := .root }}
+{{ $st := .page }}
+{{ $items_type := $st.Params.content.page_type | default "post" }}
+{{ $items_count := $st.Params.content.count | default 65535 }}
+{{ $items_sort := $st.Params.content.order| default "desc" }}
+
+{{/* Query */}}
+{{ $query := where (where site.RegularPages "Type" $items_type) "Params.featured" true }}
+{{ $archive_page := site.GetPage "Section" $items_type }}
+
+{{/* Filters */}}
+{{ if $st.Params.content.filters.tag }}
+  {{ $archive_page := site.GetPage (printf "tags/%s" (urlize $st.Params.content.filters.tag)) }}
+  {{ $query = $query | intersect $archive_page.Pages }}
+{{ end }}
+{{ if $st.Params.content.filters.category }}
+  {{ $archive_page := site.GetPage (printf "categories/%s" (urlize $st.Params.content.filters.category)) }}
+  {{ $query = $query | intersect $archive_page.Pages }}
+{{ end }}
+{{ if $st.Params.content.filters.publication_type }}
+  {{ $archive_page := site.GetPage (printf "publication_types/%s" $st.Params.content.filters.publication_type) }}
+  {{ $query = $query | intersect $archive_page.Pages }}
+{{ end }}
+{{ if $st.Params.content.filters.author }}
+  {{ $archive_page = site.GetPage (printf "authors/%s" (urlize $st.Params.content.filters.author)) }}
+  {{ $query = $query | intersect $archive_page.Pages }}
+{{ end }}
+
+{{ $count := len $query }}
+
+{{/* Sort */}}
+{{ $sort_by := "Date" }}
+{{ $query = sort $query $sort_by $items_sort }}
+
+{{/* Limit */}}
+{{ $query = first $items_count $query }}
+
+{{/* Localisation */}}
+{{ $i18n := "" }}
+{{ if eq $items_type "post" }}
+  {{ $i18n = "more_posts" }}
+{{ else if eq $items_type "event" }}
+  {{ $i18n = "more_talks" }}
+{{ else if eq $items_type "publication" }}
+  {{ $i18n = "more_publications" }}
+{{ else }}
+  {{ $i18n = "more_pages" }}
+{{ end }}
+
+{{ $columns := $st.Params.design.columns | default "2" }}
+
+<div class="col-12 {{if eq $columns "2"}}col-lg-8{{end}}">
+
+  {{ with $st.Content }}{{ . }}{{ end }}
+
+  {{ range $post := $query }}
+    {{ if eq $st.Params.design.view 1 }}
+      {{ partial "li_list" . }}
+    {{ else if eq $st.Params.design.view 3 }}
+      {{ partial "li_card" . }}
+    {{ else if eq $st.Params.design.view 4 | and (eq $items_type "publication") }}
+      {{ partial "li_citation" . }}
+    {{ else }}
+      {{ partial "li_compact" . }}
+    {{ end }}
+  {{end}}
+
+  {{/* Archive link */}}
+  {{ $show_archive_link := $st.Params.content.archive.enable | default (gt $count $items_count) }}
+  {{ if $show_archive_link }}
+
+    {{ $archive_link := "" }}
+    {{ if $st.Params.content.archive.link }}
+      {{ $archive_link = $st.Params.content.archive.link | relLangURL }}
+    {{ else }}
+      {{ $archive_link = $archive_page.RelPermalink }}
+    {{ end }}
+
+    {{ $archive_text := $st.Params.content.archive.text | default (i18n $i18n) | default "See all" }}
+
+    <div class="see-all">
+      <a href="{{ $archive_link }}">
+        {{ $archive_text | emojify }}
+        <i class="fas fa-angle-right"></i>
+      </a>
+    </div>
+  {{ end }}
+
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/authors.html ======
+{{ $ := .root }}
+{{ $page := .page }}
+
+{{ $author := "" }}
+{{ if .author }}
+  {{ $author = .author }}
+{{ else }}
+  {{ $author = $page.Params.author }}
+{{end}}
+
+{{ $person_page_path := (printf "/authors/%s" $author) }}
+{{ $person_page := site.GetPage $person_page_path }}
+{{ if not $person_page }}
+  {{ errorf "Could not find an author page at `%s`. Please check the value of `author` in your About widget and create an associated author page if one does not already exist. See https://wowchemy.com/docs/page-builder/#about " $person_page_path }}
+{{end}}
+{{ $person := $person_page.Params }}
+{{ $avatar := ($person_page.Resources.ByType "image").GetMatch "*avatar*" }}
+{{ $avatar_shape := site.Params.avatar.shape | default "circle" }}
+
+<!-- About widget -->
+<div>
+  <a class="background-img" href="#img1"><img id="img1" src="img/mountains.jpg" /></a>
+</div>
+  
+<div class="row">
+  <div class="col-12 col-lg-4">
+    <div id="profile">
+
+      {{ if site.Params.avatar.gravatar }}
+      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="https://s.gravatar.com/avatar/{{ md5 $person.email }}?s=270')" alt="{{$person_page.Title}}">
+      {{ else if $avatar }}
+      {{ $avatar_image := $avatar.Fill "270x270 Center" }}
+      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="{{ $avatar_image.RelPermalink }}" alt="{{$person_page.Title}}">
+      {{ end }}
+
+      <div class="portrait-title">
+        <h2>{{ $person_page.Title }}</h2>
+        {{ with $person.role }}<h3>{{ . | markdownify | emojify }}</h3>{{ end }}
+
+        {{ range $person.organizations }}
+        <h3>
+          {{ with .url }}<a href="{{ . }}" target="_blank" rel="noopener">{{ end }}
+          <span>{{ .name }}</span>
+          {{ if .url }}</a>{{ end }}
+        </h3>
+        {{ end }}
+      </div>
+
+      <ul class="network-icon" aria-hidden="true">
+        {{ range $person.social }}
+        {{ $pack := or .icon_pack "fas" }}
+        {{ $pack_prefix := $pack }}
+        {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+          {{ $pack_prefix = "fa" }}
+        {{ end }}
+        {{ $link := .link }}
+        {{ $scheme := (urls.Parse $link).Scheme }}
+        {{ $target := "" }}
+        {{ if not $scheme }}
+          {{ $link = .link | relLangURL }}
+        {{ else if in (slice "http" "https") $scheme }}
+          {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+        {{ end }}
+        <li>
+          <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }} aria-label="{{ .icon }}">
+            <i class="{{ $pack }} {{ $pack_prefix }}-{{ .icon }} big-icon"></i>
+          </a>
+        </li>
+        {{ end }}
+      </ul>
+
+    </div>
+  </div>
+  <div class="col-12 col-lg-1">
+  </div>
+  <div class="col-12 col-lg-7">
+  <div class="vertical-center">
+
+    {{/* Only display widget title in explicit instances of about widget, not in author pages. */}}
+    {{ if and $page.Params.widget $page.Title }}<h1>{{ $page.Title | markdownify | emojify }}</h1>{{ end }}
+
+    <div class="article-style">
+      {{ $person_page.Content }}
+      <a class="btn btn-outline-primary btn-page-header" href="/files/cv.pdf" target="_blank" rel="noopener">DOWNLOAD CV</a>
+    </div>
+
+    <div class="row">
+
+      {{ with $person.interests }}
+      <div class="col-md-5">
+        <div class="section-subheading">{{ i18n "interests" | markdownify }}</div>
+        <ul class="ul-interests mb-0">
+          {{ range . }}
+          <li>{{ . | markdownify | emojify }}</li>
+          {{ end }}
+        </ul>
+      </div>
+      {{ end }}
+
+      {{ with $person.education }}
+      <div class="col-md-7">
+        <div class="section-subheading">{{ i18n "education" | markdownify }}</div>
+        <ul class="ul-edu fa-ul mb-0">
+          {{ range .courses }}
+          <li>
+            <i class="fa-li fas fa-graduation-cap"></i>
+            <div class="description">
+              <p class="course">{{ .course }}{{ with .year }}, {{ . }}{{ end }}</p>
+              <p class="institution">{{ .institution }}</p>
+            </div>
+          </li>
+          {{ end }}
+        </ul>
+      </div>
+      {{ end }}
+
+    </div>
+  </div>
+  </div>
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/featurette.html ======
+{{ $ := .root }}
+{{ $page := .page }}
+
+<div class="row featurette">
+  {{ with $page.Title }}
+  <div class="col-md-12 section-heading">
+    <h1>{{ . | markdownify | emojify }}</h1>
+    {{ if $page.Params.subtitle }}<p>{{ $page.Params.subtitle | markdownify | emojify }}</p>{{ end }}
+  </div>
+  {{ end }}
+
+  {{ with $page.Content }}
+  <div class="col-md-12">
+    {{ . }}
+  </div>
+  {{ end }}
+
+  {{ range $page.Params.feature }}
+  {{ $pack := or .icon_pack "fas" }}
+  {{ $pack_prefix := $pack }}
+  {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+    {{ $pack_prefix = "fa" }}
+  {{ end }}
+  <div class="col-12 col-sm-4">
+    {{ with .icon }}
+    <div class="featurette-icon">
+      {{- if eq $pack "emoji" -}}
+        {{- . | emojify -}}
+      {{- else if eq $pack "custom" -}}
+        {{- $svg_icon := resources.Get (printf "media/icons/%s.svg" .) -}}
+        {{- if $svg_icon -}}<img src="{{ $svg_icon.RelPermalink }}" alt="{{.}}" class="svg-icon svg-baseline">{{- end -}}
+      {{- else -}}
+        <i class="{{ $pack }} {{ $pack_prefix }}-{{ . }}"></i>
+      {{- end -}}
+    </div>
+    {{ end }}
+    <div class="section-subheading">{{ .name | markdownify | emojify }}</div>
+    {{ with .description }}<p>{{ . | markdownify | emojify }}</p>{{ end }}
+  </div>
+  {{ end }}
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/experience.html ======
+{{ $ := .root }}
+{{ $page := .page }}
+{{ $columns := $page.Params.design.columns | default "2" }}
+
+<!-- Experience widget -->
+<div class="col-12 {{if eq $columns "2"}}col-lg-8{{end}}">
+  {{ with $page.Content }}{{ . }}{{ end }}
+
+  {{ if $page.Params.experience }}
+  {{ $exp_len := len $page.Params.experience }}
+  {{ range $idx, $key := sort $page.Params.experience ".date_start" "desc" }}
+  <div class="row experience">
+    <!-- Timeline -->
+    <div class="col-auto text-center flex-column d-none d-sm-flex">
+      <div class="row h-50">
+        <div class="col {{if gt $idx 0}}border-right{{end}}">&nbsp;</div>
+        <div class="col">&nbsp;</div>
+      </div>
+      <div class="m-2">
+        <span class="badge badge-pill border {{if not .date_end}}exp-fill{{end}}">&nbsp;</span>
+      </div>
+      <div class="row h-50">
+        <div class="col {{if lt $idx (sub $exp_len 1)}}border-right{{end}}">&nbsp;</div>
+        <div class="col">&nbsp;</div>
+      </div>
+    </div>
+    <!-- Content -->
+    <div class="col py-2">
+      <div class="card">
+        <div class="card-body">
+
+          {{- if .company_logo}}
+          {{- $svg_icon := resources.Get (printf "media/icons/brands/%s.svg" .company_logo) -}}
+          {{ if not $svg_icon }}{{ errorf "Brand logo not found at `assets/media/icons/brands/%s.svg`" .company_logo }}{{end}}
+          <div class="d-flex align-content-start">
+            <div class="mr-2 mb-2">
+              {{- with .company_url}}<a href="{{.}}" target="_blank" rel="noopener">{{end -}}
+              <img src="{{ $svg_icon.RelPermalink }}" width="56px" height="56px" alt="{{.company | plainify}}">
+              {{- with .company_url}}</a>{{end -}}
+            </div>
+            <div>
+          {{ end }}
+
+              <div class="section-subheading card-title exp-title text-muted my-0">{{.title | markdownify | emojify}}</div>
+              <div class="section-subheading card-title exp-company text-muted my-0">
+                {{- with .company_url}}<a href="{{.}}" target="_blank" rel="noopener">{{end}}{{.company | markdownify | emojify}}{{with .company_url}}</a>{{end -}}
+              </div>
+              <div class="text-muted exp-meta">
+                {{ (time .date_start).Format ($page.Params.date_format | default "January 2006") }} –
+                {{ if .date_end}}
+                  {{ (time .date_end).Format ($page.Params.date_format | default "January 2006") }}
+                {{else}}
+                  {{ i18n "present" | default "Present" }}
+                {{end}}
+                {{with .location}}
+                  <span class="middot-divider"></span>
+                  <span>{{.}}</span>
+                {{end}}
+              </div>
+
+          {{- if .company_logo}}
+            </div>
+          </div>
+          {{end}}
+
+          {{with .description}}<div class="card-text">{{. | markdownify | emojify}}</div>{{end}}
+        </div>
+      </div>
+    </div>
+  </div>
+  {{end}}
+  {{end}}
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/pages.html ======
+{{/* Pages Widget */}}
+
+{{/* Initialise */}}
+{{ $ := .root }}
+{{ $st := .page }}
+{{ $items_type := $st.Params.content.page_type | default "post" }}
+{{ $items_offset := $st.Params.content.offset | default 0 }}
+{{ $items_count := $st.Params.content.count }}
+{{ if eq $items_count 0 }}
+  {{ $items_count = 65535 }}
+{{ else }}
+  {{ $items_count = $items_count | default 5 }}
+{{ end }}
+{{ $items_sort := $st.Params.content.order | default "desc" }}
+
+{{/* Query */}}
+{{ $query := where site.RegularPages "Type" $items_type }}
+{{ $archive_page := site.GetPage "Section" $items_type }}
+
+{{/* Filters */}}
+{{ if $st.Params.content.filters.tag }}
+  {{ $archive_page = site.GetPage (printf "tags/%s" (urlize $st.Params.content.filters.tag)) }}
+  {{ $query = $query | intersect $archive_page.Pages }}
+{{ end }}
+{{ if $st.Params.content.filters.category }}
+  {{ $archive_page = site.GetPage (printf "categories/%s" (urlize $st.Params.content.filters.category)) }}
+  {{ $query = $query | intersect $archive_page.Pages }}
+{{ end }}
+{{ if $st.Params.content.filters.publication_type }}
+  {{ $archive_page = site.GetPage (printf "publication_types/%s" $st.Params.content.filters.publication_type) }}
+  {{ $query = $query | intersect $archive_page.Pages }}
+{{ end }}
+{{ if $st.Params.content.filters.author }}
+  {{ $archive_page = site.GetPage (printf "authors/%s" (urlize $st.Params.content.filters.author)) }}
+  {{ $query = $query | intersect $archive_page.Pages }}
+{{ end }}
+{{ if $st.Params.content.filters.exclude_featured }}
+  {{ $query = where $query "Params.featured" "!=" true }}
+{{ end }}
+{{ if $st.Params.content.filters.exclude_past }}
+  {{ $query = where $query "Date" ">=" now }}
+{{ end }}
+{{ if $st.Params.content.filters.exclude_future }}
+  {{ $query = where $query "Date" "<" now }}
+{{ end }}
+
+{{ $count := len $query }}
+
+{{/* Sort */}}
+{{ $sort_by := "Date" }}
+{{ $query = sort $query $sort_by $items_sort }}
+
+{{/* Offset and Limit */}}
+{{ if gt $items_offset 0 }}
+  {{ $query = first $items_count (after $items_offset $query) }}
+{{ else }}
+  {{ $query = first $items_count $query }}
+{{ end }}
+
+{{/* Localisation */}}
+{{ $i18n := "" }}
+{{ if eq $items_type "post" }}
+  {{ $i18n = "more_posts" }}
+{{ else if eq $items_type "event" }}
+  {{ $i18n = "more_talks" }}
+{{ else if eq $items_type "publication" }}
+  {{ $i18n = "more_publications" }}
+{{ else }}
+  {{ $i18n = "more_pages" }}
+{{ end }}
+
+{{ $columns := $st.Params.design.columns | default "2" }}
+
+<div class="col-12 {{if eq $columns "2"}}col-lg-9{{end}}">
+
+  {{ with $st.Content }}{{ . }}{{ end }}
+
+  {{ range $post := $query }}
+    {{ if eq $st.Params.design.view 1 }}
+      {{ partial "li_list" . }}
+    {{ else if eq $st.Params.design.view 3 }}
+      {{ partial "li_card" . }}
+    {{ else if eq $st.Params.design.view 4 | and (eq $items_type "publication") }}
+      {{ partial "li_citation" . }}
+    {{ else }}
+      {{ partial "li_compact" . }}
+    {{ end }}
+  {{end}}
+
+  {{/* Archive link */}}
+  {{ $show_archive_link := $st.Params.content.archive.enable | default (gt $count $items_count) }}
+  {{ if $show_archive_link }}
+
+    {{ $archive_link := "" }}
+    {{ if $st.Params.content.archive.link }}
+      {{ $archive_link = $st.Params.content.archive.link | relLangURL }}
+    {{ else }}
+      {{ $archive_link = $archive_page.RelPermalink }}
+    {{ end }}
+
+    {{ $archive_text := $st.Params.content.archive.text | default (i18n $i18n) | default "See all" }}
+
+    <div class="see-all">
+      <a href="{{ $archive_link }}">
+        {{ $archive_text | emojify }}
+        <i class="fas fa-angle-right"></i>
+      </a>
+    </div>
+  {{ end }}
+
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/portfolio.html ======
+{{/* Portfolio Widget */}}
+
+{{/* Initialise */}}
+{{ $ := .root }}
+{{ $st := .page }}
+{{ $items_type := $st.Params.content.page_type | default "project" }}
+{{ $columns := $st.Params.design.columns | default "2" }}
+
+<div class="col-12 {{if eq $columns "2"}}col-lg-9{{end}}">
+
+  {{ with $st.Content }}{{ . }}{{ end }}
+
+  {{ if $st.Params.content.filter_button }}
+
+    {{ $filter_default := default (int $st.Params.content.filter_default) 0 }}
+
+    {{/* Parse default filter tag from front matter in the form of either tag name or CSS class name. */}}
+    {{ $default_filter_tag_raw := (index $st.Params.content.filter_button ($filter_default)).tag }}
+    {{ $default_filter_tag := printf ".js-id-%s" (replace $default_filter_tag_raw " " "-") }}
+    {{ if or (eq (substr $default_filter_tag_raw 0 1) "*") (eq (substr $default_filter_tag_raw 0 1) ".") }}
+      {{ $default_filter_tag = $default_filter_tag_raw }}
+    {{ end }}
+
+    <span class="d-none default-project-filter">{{ $default_filter_tag }}</span>
+
+    {{/* Only show filter buttons if there are multiple filters. */}}
+    {{ if gt (len $st.Params.content.filter_button) 1 }}
+    <div class="project-toolbar">
+      <div class="project-filters">
+        <div class="btn-toolbar">
+          <div class="btn-group flex-wrap">
+            {{ range $idx, $item := $st.Params.content.filter_button }}
+              {{/* Parse filter tag from front matter in the form of either tag name or CSS class name. */}}
+              {{ $data_filter := printf ".js-id-%s" (replace .tag " " "-") }}
+              {{ if or (eq (substr .tag 0 1) "*") (eq (substr .tag 0 1) ".") }}
+                {{ $data_filter = .tag }}
+              {{ end }}
+              <a href="#" data-filter="{{ $data_filter | safeHTMLAttr }}" class="btn btn-primary btn-lg{{ if eq $idx $filter_default }} active{{ end }}">{{ .name }}</a>
+            {{ end }}
+          </div>
+        </div>
+      </div>
+    </div>
+    {{ end }}
+  {{ end }}
+
+  <div class="{{ if or $st.Params.content.filter_button (eq $st.Params.design.view 3) }}isotope projects-container{{end}} {{if eq $st.Params.design.view 3}}js-layout-masonry{{else}}row js-layout-row{{end}} {{ if eq $st.Params.design.view 5 }}project-showcase{{end}}">
+
+    {{ $query := "" }}
+    {{ if $st.Params.content.filters.tags }}
+      {{ $query = where site.Pages "Params.tags" "intersect" $st.Params.content.filters.tags }}
+    {{ else }}
+      {{ $query = where site.RegularPages "Type" $items_type }}
+    {{ end }}
+
+    {{ range $idx, $item := $query }}
+    
+      {{ $link := $item.RelPermalink }}
+      {{ $target := "" }}
+      {{ if $item.Params.external_link }}
+        {{ $link = $item.Params.external_link }}
+        {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+      {{ end }}
+
+      {{ if eq $st.Params.design.view 1 }}
+        {{ partial "portfolio_li_list" (dict "item" $item) }}
+      {{ else if eq $st.Params.design.view 2 }}
+        {{ partial "portfolio_li_compact" (dict "item" $item) }}
+      {{ else if eq $st.Params.design.view 3 }}
+        {{ partial "portfolio_li_card" (dict "widget" $st "index" $idx "item" $item "link" $link "target" $target) }}
+      {{ else }}
+        {{ partial "portfolio_li_showcase" (dict "widget" $st "index" $idx "item" $item "link" $link "target" $target) }}
+      {{ end }}
+
+    {{ end }}
+  </div>
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/contact.html ======
+{{ $ := .root }}
+{{ $st := .page }}
+{{ $autolink := default true $st.Params.content.autolink }}
+{{ $data := site.Params }}
+
+{{ $form_provider := lower $st.Params.content.form.provider | default "" }}
+{{ $form_provider_legacy := $st.Params.email_form | default 0 }}
+
+{{ $use_netlify_form := eq $form_provider "netlify" | or (eq $form_provider_legacy 1) }}
+{{ $use_formspree_form := eq $form_provider "formspree" | or (eq $form_provider_legacy 2) }}
+{{ $use_form := or $use_netlify_form $use_formspree_form }}
+
+{{ $use_netlify_captcha := $st.Params.content.form.netlify.captcha | default true }}
+
+{{ $columns := $st.Params.design.columns | default "2" }}
+
+<div class="col-12 {{if eq $columns "2"}}col-lg-8{{end}}">
+  {{ with $st.Content }}{{ . }}{{ end }}
+
+  {{ if $use_form }}
+
+    {{ $post_action := "" }}
+    {{ if $use_netlify_form }}
+      {{ $post_action = "netlify" }}
+    {{ else if $use_formspree_form }}
+      {{ if not $st.Params.content.form.formspree.id }}
+        {{ errorf "You have chosen to use Formspree as the provider for the contact form. Please set your Formspree Form ID in the Contact widget or disable the form." }}
+        {{ errorf "Documentation: https://wowchemy.com/docs/page-builder/#contact" }}
+      {{ end }}
+      {{ $post_action = printf "action=\"https://formspree.io/f/%s\"" $st.Params.content.form.formspree.id }}
+    {{end}}
+
+    <div class="mb-3">
+      <form name="contact" method="POST" {{ $post_action | safeHTMLAttr }} {{ if $use_netlify_form }}netlify-honeypot="welcome-bot"{{end}} {{ if $use_netlify_captcha }}data-netlify-recaptcha="true"{{end}}>
+        <div class="form-group form-inline">
+          <label class="sr-only" for="inputName">{{ i18n "contact_name" }}</label>
+          <input type="text" name="name" class="form-control w-100" id="inputName" placeholder="{{ i18n "contact_name" | default "Name" }}" required>
+        </div>
+        <div class="form-group form-inline">
+          <label class="sr-only" for="inputEmail">{{ i18n "contact_email" }}</label>
+          <input type="email" name="email" class="form-control w-100" id="inputEmail" placeholder="{{ i18n "contact_email" | default "Email" }}" required>
+        </div>
+        <div class="form-group">
+          <label class="sr-only" for="inputMessage">{{ i18n "contact_message" }}</label>
+          <textarea name="message" class="form-control" id="inputMessage" rows="5" placeholder="{{ i18n "contact_message" | default "Message" }}" required></textarea>
+        </div>
+        {{ if $use_netlify_form }}
+          <div class="d-none">
+            <label>Do not fill this field unless you are a bot: <input name="welcome-bot"></label>
+          </div>
+          {{ if $use_netlify_captcha }}
+            <div class="form-group" data-netlify-recaptcha="true"></div>
+          {{ end }}
+        {{ end }}
+        <button type="submit" class="btn btn-outline-primary px-3 py-2">{{ i18n "contact_send" | default "Send" }}</button>
+      </form>
+    </div>
+  {{end}}
+
+  <ul class="fa-ul">
+
+    {{ if $data.email }}
+    <li>
+      <i class="fa-li fas fa-envelope fa-2x" aria-hidden="true"></i>
+      <span id="person-email">
+      {{- if $autolink }}<a href="mailto:{{ $data.email }}">{{ $data.email }}</a>{{ else }}{{ $data.email }}{{ end -}}
+      </span>
+    </li>
+    {{ end }}
+
+    {{ with $data.phone }}
+    <li>
+      <i class="fa-li fas fa-phone fa-2x" aria-hidden="true"></i>
+      <span id="person-telephone">
+      {{- if $autolink }}<a href="tel:{{ . }}">{{ . }}</a>{{ else }}{{ . }}{{ end -}}
+      </span>
+    </li>
+    {{ end }}
+
+    {{ $addr_formatted := "" }}{{/* Scoping for maps. */}}
+    {{ if $data.address.street | or $data.address.city | or $data.address.region | or $data.address.postcode | or $data.address.country }}
+      {{ $addr_formatted = partial "functions/get_address" (dict "root" . "address" $data.address) }}
+      <li>
+        <i class="fa-li fas fa-map-marker fa-2x" aria-hidden="true"></i>
+        <span id="person-address">{{$addr_formatted}}</span>
+      </li>
+    {{ end }}
+
+    {{ with $data.directions }}
+    <li>
+      <i class="fa-li fas fa-compass fa-2x" aria-hidden="true"></i>
+      <span>{{ . | markdownify | emojify }}</span>
+    </li>
+    {{ end }}
+
+    {{ with $data.office_hours }}
+    <li>
+      <i class="fa-li fas fa-clock fa-2x" aria-hidden="true"></i>
+      <span>
+        {{- if not (reflect.IsSlice .)}}{{/* Support legacy string format. */}}
+          {{- . | markdownify | emojify -}}
+        {{else}}
+          {{- delimit . "<br>" | markdownify | emojify -}}
+        {{end -}}
+      </span>
+    </li>
+    {{ end }}
+
+    {{ with $data.appointment_url }}
+    <li>
+      <i class="fa-li fas fa-calendar-check fa-2x" aria-hidden="true"></i>
+      <a href="{{ . }}" target="_blank" rel="noopener">{{ i18n "book_appointment" | default "Book an appointment" }}</a>
+    </li>
+    {{ end }}
+
+    {{/* Contact links. */}}
+    {{ range $data.contact_links }}
+    {{ $pack := or .icon_pack "fas" }}
+    {{ $pack_prefix := $pack }}
+    {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+      {{ $pack_prefix = "fa" }}
+    {{ end }}
+    {{ $link := .link }}
+    {{ $scheme := (urls.Parse $link).Scheme }}
+    {{ $target := "" }}
+    {{ if not $scheme }}
+      {{ $link = .link | relLangURL }}
+    {{ else if in (slice "http" "https") $scheme }}
+      {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+    {{ end }}
+    <li>
+      <i class="fa-li {{ $pack }} {{ $pack_prefix }}-{{ .icon }} fa-2x" aria-hidden="true"></i>
+      <a href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }}>{{.name|markdownify|emojify|safeHTML}}</a>
+    </li>
+    {{ end }}
+
+  </ul>
+
+  {{ if and site.Params.map.provider $data.coordinates.latitude }}
+  <div class="d-none">
+    <input id="map-provider" value="{{ lower site.Params.map.provider }}">
+    <input id="map-lat" value="{{ $data.coordinates.latitude }}">
+    <input id="map-lng" value="{{ $data.coordinates.longitude }}">
+    <input id="map-dir" value="{{ $addr_formatted }}">
+    <input id="map-zoom" value="{{ site.Params.map.zoom | default "15" }}">
+    <input id="map-api-key" value="{{ site.Params.map.api_key }}">
+  </div>
+  <div id="map"></div>
+  {{ end }}
+
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/blank.html ======
+{{ $st := .page }}
+{{ $columns := $st.Params.design.columns | default "2" }}
+
+{{ if ne $columns "1" }}
+  <div class="col-12 col-lg-8">
+    {{ $st.Content }}
+  </div>
+{{ else }}
+  <div class="col-12">
+    {{ $st.Content }}
+  </div>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/widgets/slider.html ======
+{{ $ := .root }}
+{{ $page := .page }}
+{{ $hash_id := .hash_id }}
+
+<!-- Indicators -->
+<ol class="carousel-indicators">
+  {{ range $index, $item := $page.Params.item }}
+  <li data-target="#{{$hash_id}}" data-slide-to="{{$index}}" {{if eq $index 0}}class="active"{{end}}></li>
+  {{ end }}
+</ol>
+
+<!-- Carousel slides wrapper -->
+<div class="carousel-inner">
+  {{ range $index, $item := $page.Params.item }}
+
+    {{ $style_bg := "" }}
+    {{with $page.Params.height}}
+      {{ $style_bg = printf "%s height: %s;" $style_bg . }}
+    {{end}}
+    {{ if $item.overlay_color }}
+      {{ $style_bg = printf "%s background-color: %s;" $style_bg ($item.overlay_color | default "transparent") }}
+    {{ end }}
+    {{ if $item.overlay_img }}
+      {{ $bg_img := resources.Get (printf "media/%s" $item.overlay_img) }}
+      {{ if $bg_img }}
+        {{ $style_bg = printf "%sbackground-image: url('%s');" $style_bg $bg_img.Permalink }}
+      {{ else }}
+        {{ errorf "Couldn't find `%s` in the `assets/media/` folder - please add it." $item.overlay_img }}
+      {{ end }}
+      {{ if $item.overlay_filter }}
+        {{ $style_bg = printf "%sfilter: brightness(%s);" $style_bg (string $item.overlay_filter) }}
+      {{ end }}
+   {{ end }}
+
+  <div class="wg-hero dark carousel-item{{if eq $index 0}} active{{end}}" style="{{$style_bg | safeCSS}}">
+    <div class="container" style="text-align: {{$item.align | default "left"}};">
+        <h1 class="hero-title">
+          {{ with $item.title }}{{ . | markdownify | emojify }}{{ end }}
+        </h1>
+
+        {{ with $item.content }}
+        <p class="hero-lead" style="{{if eq $item.align "center"}}margin: 0 auto 0 auto;{{else if eq $item.align "right"}}margin-left: auto; margin-right: 0{{end}}">
+          {{ . | markdownify | emojify }}
+        </p>
+        {{ end }}
+
+        {{ if $item.cta_url }}
+        {{ $pack := or .cta_icon_pack "fas" }}
+        {{ $pack_prefix := $pack }}
+        {{ if in (slice "fab" "fas" "far" "fal") $pack }}
+          {{ $pack_prefix = "fa" }}
+        {{ end }}
+        <p>
+          <a href="{{ $item.cta_url }}" class="btn btn-light btn-lg">
+            {{- with $item.cta_icon -}}<i class="{{ $pack }} {{ $pack_prefix }}-{{ . }}" style="padding-right: 10px;"></i>{{- end -}}
+            {{- $item.cta_label | emojify | safeHTML -}}
+          </a>
+        </p>
+        {{ end }}
+      </div>
+  </div>
+  {{ end }}
+</div>
+
+<!-- Left and right controls -->
+<a class="carousel-control-prev" href="#{{$hash_id}}" data-slide="prev">
+  <span class="carousel-control-prev-icon"></span>
+  <span class="sr-only">Previous</span>
+</a>
+<a class="carousel-control-next" href="#{{$hash_id}}" data-slide="next">
+  <span class="carousel-control-next-icon"></span>
+  <span class="sr-only">Next</span>
+</a>
+
+====== themes/custom-wowchemy-theme/layouts/partials/hooks/page_toc_end.html ======
+
+====== themes/custom-wowchemy-theme/layouts/partials/hooks/page_toc_start.html ======
+
+====== themes/custom-wowchemy-theme/layouts/partials/site_footer_license.html ======
+{{/* Display copyright license. */}}
+
+{{ $copyright_license := .Params.copyright_license | default site.Params.copyright_license }}
+
+{{ if and $copyright_license $copyright_license.enable }}
+
+  {{ $notice := .Params.copyright_license.notice | default site.Params.copyright_license.notice }}
+  {{ $allow_commercial := .Params.copyright_license.allow_commercial | default site.Params.copyright_license.allow_commercial }}
+  {{ $allow_derivatives := .Params.copyright_license.allow_derivatives | default site.Params.copyright_license.allow_derivatives }}
+  {{ $share_alike := .Params.copyright_license.share_alike | default site.Params.copyright_license.share_alike }}
+
+  {{ $cc_code := "by" }}
+  {{ if not $allow_commercial }}
+    {{ $cc_code = printf "%s-nc" $cc_code }}
+  {{end}}
+  {{ if and $allow_derivatives $share_alike }}
+    {{ $cc_code = printf "%s-sa" $cc_code }}
+  {{ else if not $allow_derivatives }}
+    {{ $cc_code = printf "%s-nd" $cc_code }}
+  {{end}}
+
+  {{ $license_url := printf "https://creativecommons.org/licenses/%s/4.0" ($cc_code | urlize) }}
+
+  {{ with $notice }}
+  <p class="powered-by copyright-license-text">
+    {{ replace . "{license}" (printf "<a href=\"%s\" rel=\"noopener noreferrer\" target=\"_blank\">CC %s 4.0</a>" $license_url (replace $cc_code "-" " " | upper)) | markdownify }}
+  </p>
+  {{ end }}
+
+  <p class="powered-by footer-license-icons">
+    <a href="{{$license_url}}" rel="noopener noreferrer" target="_blank" aria-label="Creative Commons">
+      <i class="fab fa-creative-commons fa-2x" aria-hidden="true"></i>
+      <i class="fab fa-creative-commons-by fa-2x" aria-hidden="true"></i>
+      {{ if not $allow_commercial }}
+        <i class="fab fa-creative-commons-nc fa-2x" aria-hidden="true"></i>
+      {{end}}
+      {{ if and $allow_derivatives $share_alike }}
+        <i class="fab fa-creative-commons-sa fa-2x" aria-hidden="true"></i>
+      {{ else if not $allow_derivatives }}
+        <i class="fab fa-creative-commons-nd fa-2x" aria-hidden="true"></i>
+      {{end}}
+    </a>
+  </p>
+
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/cv_author_bar.html ======
+{{ $page := .page }}
+{{ $author_page := .author_page }}
+{{ $site_type := site.Params.site_type | default "Person" }}
+{{- $has_profile := not (eq nil $author_page.Params.superuser) -}}
+
+{{/* Check an author profile exists. */}}
+{{ if $has_profile }}
+  {{/* If it's a personal site and primary page author is superuser, link to the homepage rather than their profile page. */}}
+  {{ $profile_url := $author_page.RelPermalink }}
+  {{ $avatar := ($author_page.Resources.ByType "image").GetMatch "*avatar*" }}
+  {{ $avatar_shape := site.Params.avatar.shape | default "circle" }}
+  <div class="media cv-author-bar avatar-widget">
+      {{ $avatar_image := $avatar.Fill "270x270 Center" }}
+
+      <img class="avatar {{if eq $avatar_shape "square"}}avatar-square{{else}}avatar-circle{{end}}" src="{{ $avatar_image.RelPermalink }}" alt="{{$author_page.Title}}">
+
+  </div>
+
+  <div id="profile" class="socials">
+    {{ partial "social_links" $author_page }}
+  </div>
+
+  <a class="btn btn-outline-primary btn-page-header pdf-button" href="/files/cv.pdf" target="_blank" rel="noopener">
+    PDF
+  </a>
+
+
+
+{{end}}{{/* Profile page block */}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/custom_head.html ======
+{{/* Do not directly modify this file! */}}
+{{/* Instead, create a `layouts/partials/custom_head.html` file in your site and add your code to it. */}}
+
+{{/* This partial is included in `themes/academic/layouts/partials/site_head.html`. */}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/breadcrumb.html ======
+{{ if not .IsHome }}
+  <nav class="d-none d-md-flex" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      {{ partial "breadcrumb_helper" . }}
+      <li class="breadcrumb-item active" aria-current="page">
+        {{ .LinkTitle | emojify }}
+      </li>
+    </ol>
+  </nav>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/slides.html ======
+<div class="reveal">
+  <div class="slides">
+    {{/* Loop over each page. */}}
+    {{ range . }}
+    {{ if ne (len .Content) 0 }}
+
+    {{/* Must remove `<hr />` generated by Blackfriday footnotes as conflicts with slide delimiter. */}}
+    {{/* Commented out workaround as Blackfriday has been superseded by Goldmark in Hugo 0.60. */}}
+    {{/* TODO: reintroduce a similar workaround if Goldmark requires it. */}}
+    {{/* $content := replace .Content "<div class=\"footnotes\">\n\n<hr />" "<div class=\"footnotes\">" */}}
+    {{ $content := .Content }}{{/* For Goldmark. */}}
+
+    {{/* Let `---` delimit slides. In Goldmark, that is `<hr>`. Alternatively, for Blackfriday, use `<hr />`. */}}
+    {{ range (split $content "<hr>") }}
+
+    {{/* Each `<section>` defines a new slide. */}}
+    {{/* Only begin new slide `<section>` if not already added by custom `slide` shortcode. */}}
+    {{ if not (in . "data-noprocess") }}
+    <section>
+    {{ end }}
+      {{ . | safeHTML }}
+    </section>
+    {{ end }}
+
+    {{ end }}
+    {{ end }}
+  </div>
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/page_header.html ======
+{{ $page := . }}
+{{ $featured := (.Resources.ByType "image").GetMatch "*featured*" }}
+{{ $anchor := $page.Params.image.focal_point | default "Smart" }}
+
+{{/* Set default titles for node pages */}}
+{{ $title := .Title }}
+{{ if and (not $title) .IsNode }}
+  {{ if eq .Type "post" }}
+    {{ $title = i18n "posts" }}
+  {{ else if eq .Type "event" }}
+    {{ $title = i18n "talks" }}
+  {{ else if eq .Type "publication" }}
+    {{ $title = i18n "publications" }}
+  {{end}}
+{{end}}
+
+{{/* Header image */}}
+{{ if and .Params.header.image (not (and $featured (not .Params.image.preview_only))) }}
+<div class="article-header">
+  {{- $img := "" -}}
+  {{ $alt := (.Params.header.caption | default "") | plainify }}
+  {{ $destination := .Params.header.image }}
+  {{ $is_remote := strings.HasPrefix $destination "http" }}
+  {{- if not $is_remote -}}
+    {{- $img = (.Page.Resources.ByType "image").GetMatch $destination -}}
+    {{- if not $img -}}
+      {{- $img = resources.Get (path.Join "media" $destination) -}}
+    {{- end -}}
+  {{- end -}}
+  {{ if $img }}
+    <img src="{{$img.RelPermalink}}" class="article-banner" alt="{{$alt}}">
+  {{ else }}
+    <img src="{{ .Params.header.image }}" class="article-banner" alt="{{$alt}}">
+  {{ end }}
+
+  {{ with .Params.header.caption }}<span class="article-header-caption">{{ . | markdownify | emojify }}</span>{{ end }}
+</div>
+{{end}}
+
+{{/* Featured image layout */}}
+{{ if and $featured (not .Params.image.preview_only) }}
+
+{{/* Fit image within max size. */}}
+{{ $image := $featured }}
+
+{{/* Determine image placement. */}}
+{{ $placement := .Params.image.placement | default 1 }}{{/* Default to full column width. */}}
+{{ $image_container := "" }}
+{{ if eq $placement 2}}
+  {{ $image_container = "container" }}
+  {{ if gt $featured.Width 1200 }}
+    {{ $image = $featured.Resize "1200x" }}
+  {{ end }}
+{{else if eq $placement 3}}
+  {{ $image_container = "container-fluid" }}
+  {{ $image := $featured.Fit "2560x2560" }}
+{{else}}
+  {{ $image_container = "article-container" }}
+{{end}}
+
+<div class="article-container pt-3">
+  <h1>{{ $title }}</h1>
+
+  {{ with $page.Params.subtitle }}
+  <p class="page-subtitle">{{ . | markdownify | emojify }}</p>
+  {{end}}
+
+  {{ partial "page_metadata" (dict "page" $page "is_list" 0 "share" true) }}
+  {{ partial "page_links_div.html" $page }}
+</div>
+
+{{/* Featured image */}}
+<div class="article-header {{$image_container}} featured-image-wrapper mt-4 mb-4" style="max-width: {{$image.Width}}px; max-height: {{$image.Height}}px;">
+  <div style="position: relative">
+    <img src="{{ $image.RelPermalink }}" alt="{{ with $.Params.image.alt_text }}{{.}}{{ end }}" class="featured-image">
+    {{ with $.Params.image.caption }}<span class="article-header-caption">{{ . | markdownify | emojify }}</span>{{ end }}
+  </div>
+</div>
+{{else}}
+  {{/* Case when page has no image */}}
+
+  {{/* Wider container for nodes */}}
+  {{ $ctnr := "article-container" }}
+  {{ if $page.IsNode }}
+    {{ $ctnr = "universal-wrapper" }}
+  {{end}}
+<div class="{{$ctnr}} pt-3">
+  <h1>{{ $title }}</h1>
+
+  {{ with $page.Params.subtitle }}
+  <p class="page-subtitle">{{ . | markdownify | emojify }}</p>
+  {{end}}
+
+  {{ if not .IsNode }}
+    {{ partial "page_metadata" (dict "page" $page "is_list" 0 "share" true) }}
+    {{ partial "page_links_div.html" $page }}
+  {{end}}
+</div>
+{{end}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/marketing/google_tag_manager.html ======
+{{ if hugo.IsProduction | and site.Params.marketing.google_tag_manager }}
+<script>
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','{{site.Params.marketing.google_tag_manager}}');
+</script>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/marketing/microsoft_clarity.html ======
+{{ if hugo.IsProduction | and site.Params.marketing.microsoft_clarity }}
+<script>
+  (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window, document, "clarity", "script", '{{site.Params.marketing.microsoft_clarity}}');
+</script>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/marketing/baidu_tongji.html ======
+{{ $baidu_tongji := site.Params.marketing.baidu_tongji | default "" }}
+
+{{ if hugo.IsProduction | and $baidu_tongji }}
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?{{ $baidu_tongji }}";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/marketing/google_analytics.html ======
+{{ $ga := site.Params.marketing.google_analytics | default site.GoogleAnalytics | default "" }}
+
+{{ if hugo.IsProduction | and $ga }}
+
+{{ $gtag_config := cond site.Params.privacy_pack "{ 'anonymize_ip': true }" "{}" }}
+<script async src="https://www.googletagmanager.com/gtag/js?id={{$ga}}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+
+  function gtag() {
+      dataLayer.push(arguments);
+  }
+
+  function trackOutboundLink(url, target) {
+    gtag('event', 'click', {
+         'event_category': 'outbound',
+         'event_label': url,
+         'transport_type': 'beacon',
+         'event_callback': function () {
+           if (target !== '_blank') {
+             document.location = url;
+           }
+         }
+    });
+    console.debug("Outbound link clicked: " + url);
+  }
+
+  function onClickCallback(event) {
+    if ((event.target.tagName !== 'A') || (event.target.host === window.location.host)) {
+      return;
+    }
+    trackOutboundLink(event.target, event.target.getAttribute('target'));  // Send GA event.
+  }
+
+  gtag('js', new Date());
+  gtag('config', '{{$ga}}', {{$gtag_config|safeJS}});
+  gtag('set', {'cookie_flags': 'SameSite=None;Secure'});
+
+  // Outbound link tracking.
+  document.addEventListener('click', onClickCallback, false);
+</script>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/portfolio_li_compact.html ======
+{{ $item := .item }}
+{{ $js_tag_classes := delimit (apply (apply $item.Params.tags "replace" "." " " "-") "printf" "js-id-%s" ".") " " }}
+
+<div class="col-12 isotope-item {{ $js_tag_classes | safeHTMLAttr }}">
+  {{ partial "li_compact" $item }}
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/widget_page.html ======
+{{/* Notify JS that this is a widget page */}}
+<span class="js-widget-page d-none"></span>
+
+{{/* Get widget page */}}
+{{ $page := "" }}
+{{ $headless_bundle := "" }}
+{{ if .IsHome }}
+  {{ $page = "/home/index.md" }}
+  {{ $headless_bundle = site.GetPage $page }}
+  {{/* Check homepage exists */}}
+  {{ if not $headless_bundle }}
+    {{ warnf "Hugo cannot find a Widget Page at %s!" $page }}
+    {{ warnf "If the page exists, Hugo Server may need restarting due to file changes." }}
+    {{ warnf "Add the `/home/index.md` homepage file to each language's content folder. For example, your site should have a `content/home/` folder containing `index.md` and your homepage sections, or for multi-language sites, `content/en/home/` and `content/zh/home/` etc. Refer to the 'Build Your Homepage' and 'Language' documentation at https://wowchemy.com/docs/ and the example homepage at https://github.com/wowchemy/starter-academic/tree/master/exampleSite/content/home/index.md ." }}
+  {{ end }}
+{{ else }}
+  {{ $page = .File.Path }}
+  {{ $headless_bundle = site.GetPage $page }}
+  {{/* Check widget page exists. */}}
+  {{ if not $headless_bundle }}
+    {{ warnf "Hugo cannot find a Widget Page at %s!" $page }}
+    {{ warnf "If the page exists, Hugo Server may need restarting due to file changes." }}
+    {{ warnf "View the Widget Page documentation at https://wowchemy.com/docs/managing-content/#create-a-widget-page ." }}
+    {{ warnf "If the Hugo version is between 0.65 and 0.68, it may be a confirmed Hugo bug that is expected to be fixed in Hugo v0.69: https://github.com/wowchemy/wowchemy-hugo-modules/issues/1595#issuecomment-605514973 ." }}
+  {{ end }}
+{{ end }}
+
+{{/* Load page sections */}}
+{{ range $index, $st := where ( $headless_bundle.Resources.ByType "page" ) ".Params.active" "!=" false }}
+  {{/* Begin widget styling */}}
+  {{ $bg := $st.Params.design.background }}
+  {{ $style := "" }}
+  {{ $style_bg := "" }}
+
+  {{ if $bg.color }}
+    {{ $style_bg = printf "background-color: %s;" ($bg.color | default "transparent") }}
+  {{ end }}
+
+  {{ if and $bg.gradient_start $bg.gradient_end }}
+    {{ $angle := string $bg.gradient_angle | default "90" }}
+    {{ $style_bg = printf "%sbackground-image: linear-gradient(%sdeg, %s, %s);" $style_bg $angle $bg.gradient_start $bg.gradient_end }}
+  {{ end }}
+
+  {{ if $bg.image }}
+    {{/* See Hugo note on linking assets in styles: https://github.com/gohugoio/hugoThemes#common-permalink-issues */}}
+    {{ $bg_img := resources.Get (printf "media/%s" $bg.image) }}
+    {{ if $bg_img }}
+      {{ $style_bg = printf "%sbackground-image: url('%s');" $style_bg $bg_img.Permalink }}
+    {{ else }}
+      {{ errorf "Couldn't find `%s` in the `assets/media/` folder - please add it." $bg.image }}
+    {{ end }}
+    {{ with $bg.image_size }}
+      {{/* Allow sizes: actual, cover, and contain. */}}
+      {{ $style_bg = printf "%sbackground-size: %s;" $style_bg (replace . "actual" "auto") }}
+    {{ end }}
+    {{ with $bg.image_position }}
+      {{/* Allow valid CSS positions including left, center, and right. */}}
+      {{ $style_bg = printf "%sbackground-position: %s;" $style_bg . }}
+    {{ end }}
+  {{ end }}
+
+  {{ if $bg.image_darken }}
+    {{ $style_bg = printf "%sfilter: brightness(%s);" $style_bg (string $bg.image_darken) }}
+  {{ end }}
+
+  {{ with $st.Params.design.spacing.padding }}
+    {{ $style_pad := printf "padding: %s;" (delimit . " ") }}
+    {{ $style = print $style $style_pad }}
+  {{ end }}
+
+  {{/* Support for clip path (design.clip_path) */}}
+  {{ with $st.Params.design.clip_path }}
+    {{ $style_clip_path := printf "clip-path: %s;" . }}
+    {{ $style = print $style $style_clip_path }}
+  {{ end }}
+
+  {{ with $st.Params.advanced.css_style }}
+    {{ $style = print $style . }}
+  {{ end }}
+
+  {{/* Fix Hugo's ContentBaseName returning wrong file base name when page section is within a bundle. */}}
+  {{ $hash_id := replace $st.File.ContentBaseName "index" (path.Base (path.Split .Path).Dir) }}
+
+  {{ $widget := or $st.Params.widget "blank" }}
+  {{ if eq $widget "custom" }}{{ $widget = "blank" }}{{ end }}{{/* Support legacy Custom widget */}}
+  {{ if eq $widget "projects" }}{{ $widget = "portfolio" }}{{ end }}{{/* Support legacy Projects widget */}}
+
+  {{ $widget_path := printf "widgets/%s.html" $widget }}
+  {{ $widget_args := dict "root" $ "page" $st "hash_id" $hash_id }}
+  {{ $css_classes := $st.Params.advanced.css_class | default "" }}
+  {{ $extra_attributes := "" }}
+  {{ $use_container := true }}
+
+  {{/* Special case: Slider widget. */}}
+  {{ if in (slice "slider") $widget }}
+    {{ $css_classes = print $css_classes " carousel slide" }}
+    {{ $extra_attributes = printf "data-ride=\"carousel\" data-interval=\"%s\"" (string $st.Params.interval | default "5000") }}
+    {{ $use_container = false }}
+  {{ end }}
+
+  {{ $widget_class := printf "wg-%s" (replace (replace $widget "." "-") "_" "-") }}
+
+  {{ $widget_config_file := printf "widgets/%s-config.html" $widget }}
+  {{ if templates.Exists $widget_config_file }}
+    {{ $cfg := partial $widget_config_file $widget_args }}
+    {{ $use_container = $cfg.use_container }}
+  {{end}}
+
+  {{ $columns := $st.Params.design.columns | default "2" }}
+  {{ $use_cols := in (slice "pages" "featured" "experience" "accomplishments" "contact" "blank" "tag_cloud" "portfolio") $widget }}
+
+  {{/* Dedicated child div for bg prevents parallax 100% height issue within new CSS grid page wrapper. */}}
+  <section id="{{$hash_id}}" class="home-section {{$widget_class}} {{if $bg.text_color_light}}dark{{else if (eq $bg.text_color_light false)}}light{{end}} {{with $css_classes}}{{.}}{{end}}" {{with $style}}style="{{. | safeCSS}}"{{end}} {{print $extra_attributes | safeHTMLAttr}}>
+   <div class="home-section-bg {{if $bg.image}} bg-image{{if ($bg.image_parallax | default true) }} parallax{{end}}{{end}}" {{with $style_bg}}style="{{. | safeCSS}}"{{end}}></div>
+    {{if $use_container}}<div class="container">{{end}}
+    {{if $use_cols}}
+      <div class="row  {{if not $st.Title | or (eq $columns "1") }}justify-content-center{{end}}">
+      {{ if $st.Title }}
+        {{ if eq $columns "1" }}
+          <div class="section-heading col-12 mb-3 text-center">
+            {{ with $st.Title }}<h1 class="mb-0">{{ . | markdownify | emojify }}</h1>{{ end }}
+            {{ with $st.Params.subtitle }}<p class="mt-1">{{ . | markdownify | emojify }}</p>{{ end }}
+          </div>
+        {{else}}
+          <div class="section-heading col-12 col-lg-3 mb-3 mb-lg-0 d-flex flex-column align-items-center align-items-lg-start">
+            {{ with $st.Title }}<h1 class="mb-0">{{ . | markdownify | emojify }}</h1>{{ end }}
+            {{ with $st.Params.subtitle }}<p class="mt-1">{{ . | markdownify | emojify }}</p>{{ end }}
+          </div>
+        {{end}}
+      {{end}}
+    {{end}}
+
+      {{ partial $widget_path $widget_args }}
+
+    {{if $use_cols}}
+      </div>
+    {{end}}
+
+    {{if $use_container}}</div>{{end}}
+  </section>
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/site_head.html ======
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  {{ $is_sponsor := site.Params.i_am_a_sponsor | default false }}
+  {{ $hide_generator := site.Params.power_ups.hide_generator | default false }}
+  {{ if not (and $is_sponsor $hide_generator) }}
+    <meta name="generator" content="Wowchemy {{ site.Data.wowchemy.version }} for Hugo" />
+  {{ end }}
+
+  {{ if site.Params.marketing.google_optimize | and hugo.IsProduction }}
+    <script src="https://www.googleoptimize.com/optimize.js?id={{ site.Params.marketing.google_optimize }}"></script>
+  {{- end -}}
+
+  {{ with site.Params.marketing.google_site_verification }}
+    <meta name="google-site-verification" content="{{ . }}" />
+  {{- end -}}
+  {{ with site.Params.marketing.baidu_site_verification }}
+    <meta name="baidu-site-verification" content="{{ . }}" />
+  {{- end -}}
+  {{ with site.Params.marketing.bing_site_verification }}
+    <meta name="msvalidate.01" content="{{ . }}" />
+  {{- end -}}
+
+  {{ $scr := .Scratch }}
+
+  {{/* Attempt to load superuser. */}}
+  {{ $superuser_name := "" }}
+  {{ $superuser_username := "" }}
+  {{ $superuser_role := "" }}
+  {{ range first 1 (where (where site.Pages "Section" "authors") "Params.superuser" true) }}
+    {{ $superuser_name = .Title }}
+    {{ $superuser_username = path.Base (path.Split .Path).Dir }}
+    {{ $superuser_role = .Params.role }}
+  {{ end }}
+  {{ $scr.Set "superuser_username" $superuser_username }}{{/* Set superuser globally for page_author.html. */}}
+
+  {{ with $superuser_name }}<meta name="author" content="{{ . }}" />{{ end }}
+
+  {{/* Generate page description. */}}
+  {{ $desc := "" }}
+  {{ if .Params.summary }}
+    {{ $desc = .Params.summary }}
+  {{ else if .Params.abstract }}
+    {{ $desc = .Params.abstract }}
+  {{ else if .IsPage }}
+    {{ $desc = .Summary }}
+  {{ else if site.Params.description }}
+    {{ $desc = site.Params.description }}
+  {{ else }}
+    {{ $desc = $superuser_role }}
+  {{ end }}
+  <meta name="description" content="{{ $desc }}" />
+
+  {{ range .Translations }}
+    <link rel="alternate" hreflang="{{ .Lang }}" href="{{ .Permalink }}" />
+  {{ end }}
+  <link rel="alternate" hreflang="{{ site.LanguageCode | default "en-us" }}" href="{{ .Permalink }}" />
+
+  {{ partial "functions/parse_theme" . }}
+
+  {{/* Pre-connect to Google Fonts if the site's Font Theme uses them. */}}
+  {{ with ($scr.Get "google_fonts") }}
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  {{ end }}
+
+  {{ $css := site.Data.assets.css }}
+  {{ $js := site.Data.assets.js }}
+  {{ if ne ($scr.Get "primary") "#fff" }}
+    <meta name="theme-color" content="{{ $scr.Get "primary" }}" />
+  {{ end }}
+
+  {{/* Config LaTeX math rendering. */}}
+  {{ if or .Params.math site.Params.math }}
+    {{ $mathjax_config := resources.Get "js/mathjax-config.js" }}
+    <script src="{{ $mathjax_config.RelPermalink }}"></script>
+  {{ end }}
+
+  {{/* Attempt to load local vendor CSS, otherwise load from CDN. */}}
+  {{ $scr.Set "vendor_css_filename" "main.min.css" }}
+  {{ $scr.Set "vendor_js_filename" "main.min.js" }}
+  {{ if and (fileExists (printf "static/css/vendor/%s" ($scr.Get "vendor_css_filename"))) (fileExists (printf "static/js/vendor/%s" ($scr.Get "vendor_js_filename"))) }}
+    {{ $scr.Set "use_cdn" 0 }}
+    <link rel="stylesheet" href="{{ printf "/css/vendor/%s" ($scr.Get "vendor_css_filename") | relURL }}" />
+  {{ else }}
+    {{ $scr.Set "use_cdn" 1 }}
+    {{ if site.Params.icon.pack.ai }}
+      {{ printf "<link rel=\"stylesheet\" href=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\">" (printf $css.academicons.url $css.academicons.version) $css.academicons.sri | safeHTML }}
+    {{ end }}
+    {{ printf "<link rel=\"stylesheet\" href=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\">" (printf $css.fontAwesome.url $css.fontAwesome.version) $css.fontAwesome.sri | safeHTML }}
+
+    {{/* Workaround `.HasShortcode "gallery"` detection issue on `home/` WidgetPage v1 */}}
+    {{ if .HasShortcode "gallery" | or (and .IsHome (site.Params.require_fancybox | default true)) }}
+      {{ printf "<link rel=\"stylesheet\" href=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\" media=\"print\" onload=\"this.media='all'\">" (printf $css.fancybox.url $css.fancybox.version) $css.fancybox.sri | safeHTML }}
+    {{ end }}
+
+    {{/* Default to disabling highlighting, but allow the user to override it in .Params or site.Params.
+         Use $scr to store "highlight_enabled", so that we can read it again in footer.html. */}}
+    {{ $scr.Set "highlight_enabled" false }}
+    {{ if isset .Params "highlight" }}
+      {{ $scr.Set "highlight_enabled" .Params.highlight }}
+    {{ else if isset site.Params "highlight" }}
+      {{ $scr.Set "highlight_enabled" site.Params.highlight }}
+    {{ end }}
+    {{ if ($scr.Get "highlight_enabled") }}
+      {{ $v := $css.highlight.version }}
+      {{ with site.Params.highlight_style }}
+        {{ printf "<link rel=\"stylesheet\" href=\"%s\" crossorigin=\"anonymous\" title=\"hl-light\" media=\"print\" onload=\"this.media='all'\">" (printf $css.highlight.url $css.highlight.version .) | safeHTML }}
+        {{ printf "<link rel=\"stylesheet\" href=\"%s\" crossorigin=\"anonymous\" title=\"hl-dark\" media=\"print\" onload=\"this.media='all'\" disabled>" (printf $css.highlight.url $css.highlight.version .) | safeHTML }}
+      {{ else }}
+        {{ if eq ($scr.Get "light") true }}
+          {{ printf "<link rel=\"stylesheet\" href=\"%s\" crossorigin=\"anonymous\" title=\"hl-light\" media=\"print\" onload=\"this.media='all'\">" (printf $css.highlight.url $css.highlight.version "github") | safeHTML }}
+          {{ printf "<link rel=\"stylesheet\" href=\"%s\" crossorigin=\"anonymous\" title=\"hl-dark\" media=\"print\" onload=\"this.media='all'\" disabled>" (printf $css.highlight.url $css.highlight.version "dracula") | safeHTML }}
+        {{ else }}
+          {{ printf "<link rel=\"stylesheet\" href=\"%s\" crossorigin=\"anonymous\" title=\"hl-light\" media=\"print\" onload=\"this.media='all'\" disabled>" (printf $css.highlight.url $css.highlight.version "github") | safeHTML }}
+          {{ printf "<link rel=\"stylesheet\" href=\"%s\" crossorigin=\"anonymous\" title=\"hl-dark\" media=\"print\" onload=\"this.media='all'\">" (printf $css.highlight.url $css.highlight.version "dracula") | safeHTML }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+
+    {{/* Maps CSS. */}}
+    {{ $map_provider := lower site.Params.map.provider }}
+    {{ if in (slice "mapnik" "mapbox") $map_provider }}
+      {{ printf "<link rel=\"stylesheet\" href=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\" media=\"print\" onload=\"this.media='all'\">" (printf $css.leaflet.url $css.leaflet.version) $css.leaflet.sri | safeHTML }}
+    {{ end }}
+
+    {{ if eq (lower site.Params.search.provider) "algolia" }}
+      {{ printf "<link rel=\"stylesheet\" href=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\">" (printf $css.instantsearch.url $css.instantsearch.version) $css.instantsearch.sri | safeHTML }}
+      {{ printf "<link rel=\"stylesheet\" href=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\">" (printf $css.instantsearchTheme.url $css.instantsearchTheme.version) $css.instantsearchTheme.sri | safeHTML }}
+    {{ end }}
+
+    {{/* Load async scripts. */}}
+    {{ range $k, $v := site.Data.assets.js }}
+      {{/* TODO: investigate why `where ... "async" true` does not work. */}}
+      {{ $load := $v.async }}
+
+      {{/* Only load MathJax if required. */}}
+      {{ if (eq $k "mathJax") | and (not (or $.Params.math site.Params.math)) }}
+        {{ $load = false }}
+      {{ end }}
+
+      {{ if $load }}
+        {{ printf "<script src=\"%s\" integrity=\"%s\" crossorigin=\"anonymous\" async></script>" (printf $v.url $v.version) $v.sri | safeHTML }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+
+  {{/* Load Google Fonts if the site's Font Theme uses them. */}}
+  {{/* Note: we cannot use SRI with Google Fonts because the CSS is dynamically generated according to the user agent. */}}
+  {{ with ($scr.Get "google_fonts") }}
+    {{ if hasPrefix . "family=" }}
+      {{/* If `google_fonts` starts with "family=", use API v2 (https://developers.google.com/fonts/docs/css2) */}}
+      <link rel="preload" as="style" {{ printf "href=\"https://fonts.googleapis.com/css2?%s&display=swap\"" . | safeHTMLAttr }}>
+      <link rel="stylesheet" {{ printf "href=\"https://fonts.googleapis.com/css2?%s&display=swap\"" . | safeHTMLAttr }} media="print" onload="this.media='all'">
+    {{ else }}
+      {{/* Otherwise, use API v1 */}}
+      {{/* Hugo's htmlEscape cannot escape "|" in Google Font URIs so we implement our own escape functionality. */}}
+      <link rel="stylesheet" {{ printf "href=\"https://fonts.googleapis.com/css?family=%s&display=swap\"" . | replaceRE "\\|" "%7C" | safeHTMLAttr }}>
+      {{ warnf "There is a new version of Google Fonts. Learn how to upgrade your font pack at https://wowchemy.com/docs/customization/#custom-font" }}
+    {{ end }}
+  {{ end }}
+
+  {{ $license := printf "/*! Wowchemy v%s | https://wowchemy.com/ */\n" site.Data.wowchemy.version }}
+  {{ $license := $license | printf "%s/*! Copyright 2016-present George Cushen (https://georgecushen.com/) */\n" }}
+  {{ $license := $license | printf "%s/*! License: https://github.com/wowchemy/wowchemy-hugo-modules/blob/main/LICENSE.md */\n" }}
+  {{ $css_bundle_head := $license | resources.FromString "css/bundle-head.css" }}
+  {{ $css_options := dict "targetPath" "css/wowchemy.css" }}
+  {{- if hugo.IsProduction -}}
+    {{- $css_options = merge $css_options (dict "outputStyle" "compressed") -}}
+  {{- end -}}
+  {{ $sass_template := resources.Get "scss/main.scss" }}
+  {{ $style := $sass_template | resources.ExecuteAsTemplate "main_parsed.scss" . | toCSS $css_options }}
+  {{- if hugo.IsProduction -}}
+    {{- $style = $style | minify -}}
+  {{- end -}}
+  {{ $style := slice $css_bundle_head $style | resources.Concat "css/wowchemy.css" }}
+  
+  {{- if hugo.IsProduction -}}
+    {{- $style = $style | fingerprint "md5" -}}
+  {{- end -}}
+  <link rel="stylesheet" href="{{ $style.RelPermalink }}" />
+
+  {{ partial "marketing/google_analytics" . }}
+  {{ partial "marketing/google_tag_manager" . }}
+  {{ partial "marketing/microsoft_clarity" . }}
+  {{ partial "marketing/baidu_tongji" . }}
+
+  {{/* Netlify Identity integration. */}}
+  {{ $use_cms := templates.Exists "wowchemycms/single.wowchemycms_config.yml" | default (site.Params.cms.netlify_cms | default false) }}
+  {{ if .IsHome | and $use_cms }}
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  {{ end }}
+
+  {{ with .OutputFormats.Get "RSS" }}
+    <link rel="alternate" href="{{ .RelPermalink }}" type="application/rss+xml" title="{{ site.Title }}" />
+  {{ end }}
+
+  {{ if site.Home.OutputFormats.Get "WebAppManifest" }}
+    <link rel="manifest" href="{{ "index.webmanifest" | relLangURL }}" />
+  {{ end }}
+
+  <link rel="icon" type="image/png" href="{{ (partial "functions/get_icon" 32).RelPermalink }}" />
+  <link rel="apple-touch-icon" type="image/png" href="{{ (partial "functions/get_icon" 180).RelPermalink }}" />
+
+  <link rel="canonical" href="{{ .Permalink }}" />
+
+  {{/* Get page image for sharing. */}}
+  {{ $sharing_image := resources.GetMatch (path.Join "media" "sharing.*") }}
+  {{ $featured_image := (.Resources.ByType "image").GetMatch "*featured*" }}
+  {{ $avatar_image := (.Resources.ByType "image").GetMatch "avatar*" }}
+  {{ $has_logo := fileExists "assets/media/logo.png" | or (fileExists "assets/media/logo.svg") }}
+  {{ $og_image := "" }}
+  {{ $twitter_card := "summary_large_image" }}
+  {{ if (and (eq .Kind "term") $avatar_image) }}
+    {{/* Match image processing in About widget to prevent generating more images than necessary. */}}
+    {{ $og_image = ($avatar_image.Fill "270x270 Center").Permalink }}
+    {{ $twitter_card = "summary" }}
+  {{ else if $featured_image }}
+    {{ $og_image = $featured_image.Permalink }}
+  {{ else if $sharing_image }}
+    {{ $og_image = $sharing_image.Permalink }}
+  {{ else if $has_logo }}
+    {{ $og_image = (partial "functions/get_logo" (dict "constraint" "fit" "size" 300)).Permalink }}
+    {{ $twitter_card = "summary" }}
+  {{ else }}
+    {{ $og_image = (partial "functions/get_icon" 512).Permalink }}
+    {{ $twitter_card = "summary" }}
+  {{ end }}
+  {{ $scr.Set "og_image" $og_image }}{{/* Set `og_image` globally for `rss.xml`. */}}
+  <meta property="twitter:card" content="{{ $twitter_card }}" />
+  {{ with site.Params.twitter }}
+    <meta property="twitter:site" content="@{{ . }}" />
+    <meta property="twitter:creator" content="@{{ . }}" />
+  {{ end }}
+  <meta property="og:site_name" content="{{ site.Title }}" />
+  <meta property="og:url" content="{{ .Permalink }}" />
+  <meta property="og:title" content="{{ if not .IsHome }}{{ .Title }} | {{ end }}{{ site.Title }}" />
+  <meta property="og:description" content="{{ $desc }}" />
+  {{- with $og_image -}}
+    <meta property="og:image" content="{{ . }}" />
+    <meta property="twitter:image" content="{{ . }}" />
+  {{- end -}}
+  <meta property="og:locale" content="{{ site.LanguageCode | default "en-us" }}" />
+  {{ if .IsPage }}
+    {{ if not .PublishDate.IsZero }}
+      <meta
+        property="article:published_time"
+        content="{{ .PublishDate.Format "2006-01-02T15:04:05-07:00" | safeHTML }}"
+      />
+    {{ else if not .Date.IsZero }}
+      <meta property="article:published_time" content="{{ .Date.Format "2006-01-02T15:04:05-07:00" | safeHTML }}" />
+    {{ end }}
+    {{ if not .Lastmod.IsZero }}<meta property="article:modified_time" content="{{ .Lastmod.Format "2006-01-02T15:04:05-07:00" | safeHTML }}">{{ end }}
+  {{ else }}
+    {{ if not .Date.IsZero }}
+      <meta property="og:updated_time" content="{{ .Date.Format "2006-01-02T15:04:05-07:00" | safeHTML }}" />
+    {{ end }}
+  {{ end }}
+
+  {{ partial "jsonld/main" (dict "page" . "summary" $desc) }}
+  {{ partial "cookie_consent" . }}
+  {{ partial "custom_head" . }}
+
+  <title>{{ if not .IsHome }}{{ .Title }} | {{ end }}{{ site.Title }}</title>
+</head>
+
+====== themes/custom-wowchemy-theme/layouts/partials/li_card.html ======
+{{ $item := . }}
+
+{{/* Dynamic view adjusts to content type. */}}
+{{ $has_attachments := partial "functions/has_attachments" . }}
+
+{{/* Get summary. */}}
+{{ $summary := "" }}
+{{ if $item.Params.summary }}
+  {{ $summary = $item.Params.summary | markdownify | emojify }}
+{{ else if .Params.abstract }}
+  {{ $summary = .Params.abstract | markdownify | emojify }}
+{{ else if $item.Summary }}
+  {{ $summary = $item.Summary }}
+{{ end }}
+
+<div class="card-simple">
+
+  {{ if eq $item.Type "event" }}
+  <div class="article-metadata">
+    {{ if $item.Params.authors }}
+    <div>
+      {{ partial "page_metadata_authors" $item }}
+    </div>
+    {{ end }}
+    <span>
+      {{ partial "functions/get_event_dates" $item }}
+    </span>
+    {{ with $item.Params.location }}
+    <span class="middot-divider"></span>
+    <span>{{ . }}</span>
+    {{ end }}
+  </div>
+  {{ else }}
+    {{ partial "page_metadata" (dict "page" $item "is_list" 1) }}
+  {{ end }}
+
+  {{ $resource := ($item.Resources.ByType "image").GetMatch "*featured*" }}
+  {{ $anchor := $item.Params.image.focal_point | default "Smart" }}
+  {{ with $resource }}
+  {{ $image := .Fill (printf "808x455 %s" $anchor) }}
+  <a href="{{ $item.RelPermalink }}">
+    <div class="img-hover-zoom"><img src="{{ $image.RelPermalink }}" class="article-banner" alt="{{ $item.Title }}" loading="lazy"></div>
+  </a>
+  {{end}}
+
+  <div class="section-subheading article-title mb-1 mt-3">
+    <a href="{{ $item.RelPermalink }}">{{ $item.Title }}</a>
+  </div>
+
+  {{ with $summary }}
+  <a href="{{ $item.RelPermalink }}" class="summary-link">
+    <div class="article-style">
+      <p>{{.}}</p>
+    </div>
+  </a>
+  {{ end }}
+
+  {{ if $has_attachments }}
+  <div class="btn-links">
+    {{ partial "page_links" (dict "page" $item "is_list" 1) }}
+  </div>
+  {{ end }}
+
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/portfolio_li_showcase.html ======
+{{ $item := .item }}
+{{ $widget := .widget }}
+
+{{ $do_link := true }}
+{{ if $item.Params.external_link | or $item.Content }}
+  {{ $do_link = true }}
+{{ else }}
+  {{ $do_link = false }}
+{{ end }}
+
+{{ $link := .link }}
+{{ $target := .target }}
+
+{{/* Get summary. */}}
+{{ $summary := "" }}
+{{ if $item.Params.summary }}
+  {{ $summary = $item.Params.summary | markdownify | emojify }}
+{{ else if .Params.abstract }}
+  {{ $summary = .Params.abstract | markdownify | emojify }}
+{{ else if $item.Summary }}
+  {{ $summary = $item.Summary }}
+{{ end }}
+
+{{ $order := "" }}
+{{ if and ($widget.Params.design.flip_alt_rows | default true) (not (modBool .index 2)) }}
+  {{ $order = "order-md-2" }}
+{{ end }}
+
+{{ $js_tag_classes := delimit (apply (apply $item.Params.tags "replace" "." " " "-") "printf" "js-id-%s" ".") " " }}
+
+<div class="col-lg-12 project-item isotope-item {{ $js_tag_classes | safeHTMLAttr }}">
+  <div class="row align-items-center">
+    {{ $resource := ($item.Resources.ByType "image").GetMatch "*featured*" }}
+    {{if $resource}}
+    <div class="col-12 col-md-6">
+    {{else}}
+    <div class="col-12">
+    {{end}}
+    <div class="section-subheading article-title mb-0 mt-0">
+      {{- if $do_link}}<a href="{{ $link }}" {{ $target | safeHTMLAttr }}>{{end -}}
+      {{ $item.Title | markdownify | emojify }}
+      {{- if $do_link}}</a>{{end -}}
+    </div>
+      {{ with $summary }}
+      <div class="summary-style">
+        {{ . }}
+        </div>
+      {{ end }}
+      <div class="btn-links">
+        {{ partial "page_links" (dict "page" $item "is_list" 0) }}
+      </div>
+
+    </div>
+    <div class="col-12 col-md-6 order-first {{$order}}">
+      {{ with $resource }}
+      {{ $image := .Resize "540x" }}
+      {{if $do_link}}<a href="{{ $link }}" {{ $target | safeHTMLAttr }}>{{end}}
+        <img src="{{ $image.RelPermalink }}" alt="{{ $item.Title }}" loading="lazy">
+      {{if $do_link}}</a>{{end}}
+      {{end}}
+    </div>
+  </div>
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/docs_layout.html ======
+{{ $current_page := . }}
+
+<div class="container-fluid docs">
+  <div class="row flex-xl-nowrap">
+    <div class="col-12 col-md-3 col-xl-2 docs-sidebar">
+      {{ partial "docs_sidebar" . }}
+    </div>
+
+
+    {{ if .Params.toc }}
+    <div class="d-none d-xl-block col-xl-2 docs-toc">
+      <ul class="nav toc-top">
+        <li><a href="#" id="back_to_top" class="docs-toc-title">{{ i18n "on_this_page" }}</a></li>
+      </ul>
+
+      {{ .TableOfContents }}
+
+    </div>
+    {{ end }}
+
+    <main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 docs-content" role="main">
+
+      <article class="article">
+
+        <div class="docs-article-container">
+          <h1>{{ .Title }}</h1>
+
+          <div class="article-style">
+            {{ .Content }}
+          </div>
+
+          {{ partial "tags.html" . }}
+
+          {{ if site.Params.docs_section_pager }}
+          <div class="article-widget">
+            {{ partial "section_pager" . }}
+          </div>
+          {{ end }}
+        </div>
+
+        <div class="body-footer">
+          <p>{{ i18n "last_updated" }} {{ $.Lastmod.Format site.Params.date_format }}</p>
+
+          {{ partial "page_edit" . }}
+
+          {{ partial "comments" . }}
+
+          {{ partial "page_related" . }}
+        </div>
+
+      </article>
+
+      {{ partial "site_footer" . }}
+
+    </main>
+  </div>
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/comments/disqus.html ======
+{{ if site.Params.comments.disqus.shortname }}
+<div id="disqus_thread"></div>
+<script>
+  var disqus_config = function () {
+    {{with .Params.disqus_identifier }}this.page.identifier = '{{ . }}';{{end}}
+    {{with .Params.disqus_title }}this.page.title = '{{ . }}';{{end}}
+    {{with .Params.disqus_url }}this.page.url = '{{ . | html  }}';{{end}}
+  };
+  (function() {
+    if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+      document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+      return;
+    }
+    var d = document, s = d.createElement('script'); s.async = true;
+    s.src = 'https://' + {{site.Params.comments.disqus.shortname}} + '.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+{{end}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/comments/commento.html ======
+<div id="commento"></div>
+{{ $url := (printf "%s/js/commento.js" (site.Params.comments.commento.url | default "https://cdn.commento.io")) }}
+<script src="{{$url}}" defer></script>
+
+====== themes/custom-wowchemy-theme/layouts/partials/site_footer.html ======
+<footer class="site-footer">
+
+  {{ if .IsTranslated | and site.Params.footer.show_translations }}
+    <div class="powered-by d-flex flex-wrap pb-2 justify-content-center">
+      <div class="p-2 font-weight-bold"><i class="fas fa-globe pr-1" aria-hidden="true"></i>{{ i18n "languages" }}:</div>
+      <div class="p-2">{{ index site.Data.i18n.languages .Lang }}</div>
+      {{ range .Translations }}
+        <div class="p-2"><a href="{{ .Permalink }}">{{ index site.Data.i18n.languages .Lang }}</a></div>
+      {{ end }}
+    </div>
+  {{ end }}
+
+  {{ if or (site.GetPage "terms.md") (site.GetPage "privacy.md") }}
+  <p class="powered-by">
+    {{ with site.GetPage "privacy.md" }}
+      {{ printf "<a href=\"%s\">%s</a>" .RelPermalink .Title | safeHTML }}
+    {{ end }}
+    {{ with site.GetPage "terms.md" }}
+      {{ if site.GetPage "privacy.md" }} &middot; {{ end }}
+      {{ printf "<a href=\"%s\">%s</a>" .RelPermalink .Title | safeHTML }}
+    {{ end }}
+  </p>
+  {{ end }}
+
+  {{ with site.Copyright }}
+  <p class="powered-by">
+    {{ replace . "{year}" now.Year | markdownify }}
+  </p>
+  {{ end }}
+
+  {{/* Display copyright license. */}}
+  {{ partial "site_footer_license" . }}
+
+
+</footer>
+
+====== themes/custom-wowchemy-theme/layouts/partials/docs_sidebar.html ======
+{{ $current_page := . }}
+
+{{/* Dynamically load menu for this docs page. */}}
+{{/* Attempt to get menu name from `menu_name` param, Hugo's front matter menu config, or the last dir of filepath. */}}
+{{ $menu_name := "" }}
+{{ if .Params.menu | and (not (reflect.IsMap .Params.menu)) | and (not (reflect.IsSlice .Params.menu)) }}
+  {{ $menu_name = .Params.menu }}
+{{ else if .Params.menu | and (or (reflect.IsMap .Params.menu) (reflect.IsSlice .Params.menu)) }}
+  {{ range $k, $v := .Params.menu }}
+    {{ $menu_name = $k }}
+  {{ end }}
+{{ end }}
+{{ $menu_name = .Params.menu_name | default $menu_name | default (path.Base (path.Split .File).Dir) }}
+{{ if not (index site.Menus $menu_name) }}
+  {{ errorf "Please define menu items named `menu: %s:` in your %s front matter or define `[[menu.%s]]` in `config/default/menus.toml`. See https://wowchemy.com/docs/managing-content/#menus" $menu_name .Path $menu_name }}
+{{ end }}
+
+<form class="docs-search d-flex align-items-center">
+  <button class="btn docs-toggle d-md-none p-0 mr-3" type="button" data-toggle="collapse" data-target="#docs-nav" aria-controls="docs-nav" aria-expanded="false" aria-label="Toggle section navigation">
+    <span><i class="fas fa-bars"></i></span>
+  </button>
+
+  {{ if eq (lower site.Params.search.provider) "wowchemy" }}
+  <input name="q" type="search" class="form-control" placeholder="{{ i18n "search_placeholder" }}" autocomplete="off">
+  {{ end }}
+</form>
+
+<nav class="collapse docs-links" id="docs-nav">
+  {{ with (index site.Menus $menu_name) }}
+
+  {{/* Enable Updates layout to order by descending version name. */}}
+  {{ $menu := (index site.Menus $menu_name) }}
+  {{ if eq ($.Scratch.Get "docs_menu_sort" | default "weight") "name_reverse" }}
+    {{ $menu = sort $menu "Title" "desc" }}
+  {{ else }}
+    {{ $menu = $menu.ByWeight }}
+  {{end}}
+
+  {{ range $menu }}
+  <div class="docs-toc-item{{ if $current_page.IsMenuCurrent $menu_name . }} active{{ end }}">
+    <a class="docs-toc-link" {{ if .URL }}href="{{ .URL }}"{{else if .HasChildren }}href="{{ (index .Children 0).URL }}"{{end}}>{{ .Name }}</a>
+
+    {{- if .HasChildren }}
+    <ul class="nav docs-sidenav">
+      {{ range .Children }}
+      <li {{ if $current_page.IsMenuCurrent $menu_name . }}class="active"{{ end }}>
+        <a href="{{ .URL }}">{{ .Name }}</a>
+      </li>
+
+      {{ end }}
+    </ul>
+    {{ end }}
+
+  </div>
+  {{ end }}
+  {{ end }}
+</nav>
+
+====== themes/custom-wowchemy-theme/layouts/partials/page_author.html ======
+{{/* Author profile box */}}
+
+{{/* Don't show author box on normal pages or if author box disabled. */}}
+{{ if ne .Type "page" | and (not (or (eq site.Params.profile false) (eq .Params.profile false))) }}
+
+{{/* Display superuser if superuser exists and page authors are not explicitly specified. */}}
+{{/* Otherwise, display first author if a profile for them exists. */}}
+
+{{ if and (not .Params.authors) (.Scratch.Get "superuser_username") }}
+  {{ $author_page := site.GetPage (printf "/%s/%s" "authors" (.Scratch.Get "superuser_username")) }}
+  {{ partial "page_author_card" (dict "author_page" $author_page) }}
+{{ else if .Params.authors }}
+  {{ $taxonomy := "authors" }}
+  {{ range $author_obj := (.GetTerms $taxonomy) }}
+    {{ partial "page_author_card" (dict "author_page" $author_obj.Page) }}
+  {{ end }}
+{{ end }}
+
+{{end}}{{/* Show profile block */}}
+
+====== themes/custom-wowchemy-theme/layouts/partials/comments.html ======
+{{ $provider := trim (site.Params.comments.provider | lower) " " }}
+
+{{ if $provider }}
+  {{ $provider_tpl := printf "partials/comments/%s.html" $provider }}
+  {{ $provider_exists := templates.Exists $provider_tpl }}
+  {{ if not $provider_exists }}
+    {{ errorf "The '%s' comment provider was not found." $provider }}
+  {{ end }}
+
+  {{ $commentable_page_types := site.Params.comments.commentable | default dict }}
+  {{ $commentable_page_type := index $commentable_page_types .Type | default false }}
+  {{ $commentable_page := (ne .Params.commentable false) | and $commentable_page_type }}
+
+  {{ if $commentable_page }}
+  <section id="comments">
+    {{ partial $provider_tpl . }}
+  </section>
+  {{ end }}
+{{ end }}
+
+====== themes/custom-wowchemy-theme/layouts/partials/li_compact.html ======
+{{ $item := . }}
+
+{{/* Dynamic view adjusts to content type. */}}
+{{ $show_authors_only := false }}{{/* Show authors only or full metadata? */}}
+{{ $link := $item.RelPermalink }}
+{{ $target := "" }}
+{{ if $item.Params.external_link }}
+  {{ $link = $item.Params.external_link }}
+  {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+{{ end }}
+{{ if eq $item.Type "event" }}
+  {{ $show_authors_only = true }}
+{{ else if eq $item.Type "publication" }}
+  {{ $show_authors_only = true }}
+{{ else if eq $item.Type "project" }}
+  {{ $show_authors_only = true }}
+{{ end }}
+
+{{ $has_attachments := partial "functions/has_attachments" . }}
+
+{{/* Get summary. */}}
+{{ $summary := "" }}
+{{ if $item.Params.summary }}
+  {{ $summary = $item.Params.summary | markdownify | emojify }}
+{{ else if .Params.abstract }}
+  {{ $summary = .Params.abstract | markdownify | emojify | truncate (site.Params.abstract_length | default 135) }}
+{{ else if $item.Summary }}
+  {{ $summary = $item.Summary }}
+{{ end }}
+
+<div class="media stream-item">
+  <div class="media-body">
+
+    <div class="section-subheading article-title mb-0 mt-0">
+      <a href="{{$link}}" {{ $target | safeHTMLAttr }}>{{ $item.Title }}</a>
+    </div>
+
+    {{ with $summary }}
+    <a href="{{ $link }}" {{ $target | safeHTMLAttr }} class="summary-link">
+      <div class="article-style">
+        {{.}}
+      </div>
+    </a>
+    {{ end }}
+
+    <div class="stream-meta article-metadata">
+
+      {{ if eq $item.Type "event" }}
+      <div>
+        <span>
+          {{ partial "functions/get_event_dates" $item }}
+        </span>
+        {{ with $item.Params.location }}
+        <span class="middot-divider"></span>
+        <span>{{ . }}</span>
+        {{ end }}
+      </div>
+      {{ end }}
+
+      {{ if and $show_authors_only $item.Params.authors }}
+      <div>
+        {{ partial "page_metadata_authors" $item }}
+      </div>
+      {{ else if not $show_authors_only }}
+        {{ partial "page_metadata" (dict "page" $item "is_list" 1) }}
+      {{ end }}
+    </div>
+
+    {{ if $has_attachments }}
+    <div class="btn-links">
+      {{ partial "page_links" (dict "page" $item "is_list" 1) }}
+    </div>
+    {{ end }}
+
+  </div>
+  <div class="ml-3">
+    {{ $resource := ($item.Resources.ByType "image").GetMatch "*featured*" }}
+    {{ with $resource }}
+    {{ $image := .Resize "150x" }}
+    <a href="{{$link}}" {{ $target | safeHTMLAttr }}>
+      <img src="{{ $image.RelPermalink }}" alt="{{ $item.Title }}" loading="lazy">
+    </a>
+    {{end}}
+  </div>
+</div>
+
+====== themes/custom-wowchemy-theme/layouts/partials/pagination.html ======
+{{ if or (.Paginator.HasPrev) (.Paginator.HasNext) }}
+<nav>
+  <ul class="pagination justify-content-center">
+    {{ if .Paginator.HasPrev }}
+    <li class="page-item"><a class="page-link" href="{{ .Paginator.Prev.URL }}">&laquo;</a></li>
+    {{ end }}
+    {{ if .Paginator.HasNext }}
+    <li class="page-item"><a class="page-link" href="{{ .Paginator.Next.URL }}">&raquo;</a></li>
+    {{ end }}
+  </ul>
+</nav>
+{{ end }}
+
