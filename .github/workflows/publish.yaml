@@ -64,19 +64,13 @@ jobs:
           hugo --minify
 
       - name: Debug HTML
-              run: |
-                echo "===== Listing generated files in public/ ====="
-                ls -R public || true
+        run: |
+          echo "===== Listing generated files in public/ ====="
+          ls -R public || true
 
-                echo "===== Checking index.html for Hero or About text ====="
-                grep -C 5 -iE 'Welcome|About Me|hero|admin' public/index.html || true
+          echo "===== Checking index.html for Hero or About text ====="
+          grep -C 5 -iE 'Welcome|About Me|hero|admin' public/index.html || true
 
-            - name: Upload artifact
-              uses: actions/upload-pages-artifact@v2
-              with:
-                path: ./public
-
-      # Move the Pages config step after the site is built
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v3
