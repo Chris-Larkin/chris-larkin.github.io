@@ -1,7 +1,8 @@
 name: Deploy website to GitHub Pages
 
 env:
-  WC_HUGO_VERSION: '0.126.3'
+  # 1) Pin the Hugo version to 0.139.4 for consistency
+  WC_HUGO_VERSION: '0.139.4'
 
 on:
   push:
@@ -28,11 +29,16 @@ jobs:
           # Fetch history for Hugo's .GitInfo and .Lastmod
           fetch-depth: 0
 
+      # 2) Setup Hugo Extended AFTER checkout, pinned to the same version used by GitHub Pages
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
           hugo-version: ${{ env.WC_HUGO_VERSION }}
           extended: true
+
+      # OPTIONAL: Print the Hugo version to confirm extended is installed
+      - name: Check Hugo Version
+        run: hugo version
 
       - uses: actions/cache@v3
         with:
@@ -41,20 +47,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-hugomod-
 
-      # NEW: Setup Node so we can run npm commands
+      # 3) Node setup (for PostCSS pipeline)
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: '16'
 
-      # NEW: Install PostCSS and Autoprefixer so Hugo can run PostCSS pipeline
       - name: Install PostCSS
         run: npm install postcss postcss-cli autoprefixer
 
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v3
-
+      # 4) Build Site with Hugo Extended
       - name: Build with Hugo
         env:
           HUGO_ENVIRONMENT: production
@@ -64,6 +66,11 @@ jobs:
 
       - name: Generate Pagefind search index
         run: npx pagefind --site "public"
+
+      # 5) Setup Pages AFTER the build
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v3
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
