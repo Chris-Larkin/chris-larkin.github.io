@@ -70,9 +70,3 @@ outputFormats:
     isPlainText: true
     mediatype: text/netlify
     notAlternative: true
-
-# You renamed "authors" taxonomy to "contributors". That's fine.
-taxonomies:
-  author: "contributors"
-  category: "categories"
-  tag: "tags"
